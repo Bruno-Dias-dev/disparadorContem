@@ -3,8 +3,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from utils import log_acao
-from captcha import CaptchaSolver
+from src.utils import log_acao
+from src.captcha import CaptchaSolver
 from datetime import datetime
 
 class Navegador:

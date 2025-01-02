@@ -19,7 +19,7 @@ LOGIN_USUARIO = os.getenv("SISTEMA_LOGIN")
 LOGIN_SENHA = os.getenv("SISTEMA_SENHA")
 
 URL_LOGIN = "https://www.digitalsaude.com.br/login"
-URL_RELATORIO = "https://www.digitalsaude.com.br/operacional/relatorio/ExibirImprimirRelatorioContrato"
+URL_RELATORIO = "https://www.digitalsaude.com.br/financeiro/relatorio/ExibirImprimirRelatorioInadimplente"
 URL_PROCESSOS = "https://www.digitalsaude.com.br/global/processo/ListarProcesso"
 
 # Função para logar ações realizadas pelo robô
@@ -40,13 +40,13 @@ def iniciar_navegacao():
             "download.prompt_for_download": False,
             "safebrowsing.enabled": True
         }
-        chrome_options.add_experimental_option("prefs", prefs)
+        #chrome_options.add_experimental_option("prefs", prefs)
         
         # Caso queira executar em modo headless
-        chrome_options.add_argument("--headless")
-        chrome_options.add_argument("--disable-gpu")
-        chrome_options.add_argument("--no-sandbox")
-        chrome_options.add_argument("--disable-dev-shm-usage")
+        #chrome_options.add_argument("--headless")
+        #chrome_options.add_argument("--disable-gpu")
+        #chrome_options.add_argument("--no-sandbox")
+        #chrome_options.add_argument("--disable-dev-shm-usage")
 
         driver = webdriver.Chrome(options=chrome_options)
         driver.maximize_window()
@@ -135,6 +135,14 @@ def Preencher_login(driver):
     except Exception as e:
         raise RuntimeError(f"Erro ao realizar login: {e}")
 
+def clicar_botao_cookie(driver):
+    try:
+        log_info("Clicando no botão de cookie")
+        btn_cookie = aguardar_elemento_clicavel(driver, By.XPATH, "//a[@onclick='purecookieDismiss();']")
+        btn_cookie.click()
+        log_info("Botão de cookie clicado com sucesso")
+    except Exception as e:
+        raise RuntimeError(f"Erro ao clicar no botão de cookie: {e}")
 
 def realizar_login(driver):
     try:
@@ -149,42 +157,72 @@ def realizar_login(driver):
         log_info("Login realizado com sucesso")
     except Exception as e:
         raise RuntimeError(f"Erro ao realizar login: {e}")
-    
+
 def gerar_relatorio(driver):
     try:
         log_info("Acessando página para gerar relatório")
         driver.refresh()
         driver.get(URL_RELATORIO)
         driver.refresh()
-        time.sleep(10)
 
         # Aguarda a presença do seletor de relatório
         aguardar_elemento(driver, By.NAME, "idRelatorio")
+
+        # Marcar todos os convênios
+        time.sleep(5)
+        link_marcar_todos_convenios = aguardar_elemento_clicavel(driver, By.XPATH, "//a[contains(@href, \"marcarTodos('idConvenioArray'\")]")
+        link_marcar_todos_convenios.click()
+
+        # Marcar convênios cancelados
+        time.sleep(5)
+        link_marcar_convenios_cancelados = aguardar_elemento_clicavel(driver, By.XPATH, "//a[contains(@href, \"marcarTodos('convenio-cancelado'\")]")
+        link_marcar_convenios_cancelados.click()
+
+        # Marcar status de contrato
+        time.sleep(5)
+        link_marcar_status_contrato = aguardar_elemento_clicavel(driver, By.XPATH, "//a[contains(@href, \"marcarTodos('idStatusContratoArray'\")]")
+        link_marcar_status_contrato.click()
+
         time.sleep(10)
 
-        # Aplica os filtros marcando todos
-        filtros = ["idConvenioArray", "convenio-cancelado", "idStatusContratoArray"]
-        for filtro in filtros:
-            # Aguarda link de "marcar todos"
-            time.sleep(10)
-            link_marcar_todos = aguardar_elemento_clicavel(driver, By.XPATH, f"//a[contains(@href, \"marcarTodos('{filtro}'\")]")
-            link_marcar_todos.click()
-        
-        time.sleep(10)
+        # Escolher o Mes Inicial
+        #select = Select(driver.find_element(By.NAME, "mesCompetenciaInicial"))
+        #select.select_by_value('12')
+        #time.sleep(2)
+        # Escolher o Ano Inicial
+        #select = Select(driver.find_element(By.NAME, "anoCompetenciaInicial"))
+        #select.select_by_visible_text("2024")
+        #time.sleep(2)
+        # Escolher o Mês Final
+        #select = Select(driver.find_element(By.NAME, "mesCompetenciaFinal"))
+        #select.select_by_value('12')
+        #time.sleep(2)
+        # Escolher o Ano Final
+        #select = Select(driver.find_element(By.NAME, "anoCompetenciaFinal"))
+        #select.select_by_visible_text("2024")
+        #time.sleep(2)
+        #checkbox = driver.find_element(By.NAME,'exibirValorNet')
+        #if not checkbox.is_selected():
+            #checkbox.click()
 
-        # Seleciona tipo de relatório
+        #time.sleep(2)
+
+        # Escolher o tipo de relatório
         select = Select(driver.find_element(By.NAME, "idRelatorio"))
-        select.select_by_visible_text("Planilha de Contratos")
+        select.select_by_visible_text("Planilha de Inadimplência")
+
+        # Clicar no botão para gerar relatório
+        #WebDriverWait(driver, 10).until(
+        #    EC.element_to_be_clickable((By.CSS_SELECTOR, "a.btn.btn-large.btn-primary.pull-right"))
+        #).click()
 
         time.sleep(10)
-
 
         # Clica em "Gerar Relatório"
         btn_gerar = aguardar_elemento_clicavel(driver, By.CSS_SELECTOR, "a.btn.btn-large.btn-primary.pull-right")
         HORAEXECUCAO = datetime.now()
         log_info(f"Momento da execução salvo: {HORAEXECUCAO}")
         btn_gerar.click()
-
 
         # Aguardar a conclusão da geração (pode-se aguardar um elemento de confirmação ou spinner desaparecer)
         # Aqui, apenas espera um tempo fixo, mas o ideal é aguardar um elemento.
@@ -195,12 +233,11 @@ def gerar_relatorio(driver):
     except Exception as e:
         raise RuntimeError(f"Erro ao gerar relatório: {e}")
 
-
 def baixar_relatorio(driver, momento_execucao):
     try:
         log_info("Acessando página de processos para download do relatório")
         driver.refresh()
-        time.sleep(1200)
+        time.sleep(20)
         driver.get(URL_PROCESSOS)
         driver.refresh()
         # Loop até encontrar o relatório. Atenção: isso pode gerar loop infinito se o relatório nunca aparecer.
@@ -211,7 +248,7 @@ def baixar_relatorio(driver, momento_execucao):
 
         while tentativas < max_tentativas:
             driver.refresh()
-            time.sleep(30)  # Aguarda 30s entre tentativas
+            time.sleep(60)  # Aguarda 30s entre tentativas
             tentativas += 1
             log_info(f"Tentativa {tentativas}/{max_tentativas}")
 
@@ -237,7 +274,7 @@ def baixar_relatorio(driver, momento_execucao):
                             if "downloadArquivoRelatorio" in link:
                                 botao.click()
                                 log_info("download iniciado com sucesso")
-                                time.sleep(500)
+                                time.sleep(280) # Varia de acordo com o tamanho do relatório
                                 return
                             else:
                                 log_info("Realtório ainda não foi processado")

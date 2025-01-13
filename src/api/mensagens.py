@@ -3,6 +3,7 @@ import auth
 from download_pdf import baixar_pdf, converter_para_base64
 
 URI_MESSAGES = 'messages'
+CONEXAO_GESTAO_SAUDE = '79d8bc4b-4db2-4320-bd6b-f40fd0b6ae60'
 
 #Listagem de mensagens
 def get_mensagens(page=1, qtd=50):
@@ -48,7 +49,7 @@ def post_mensagem_sem_cadastro(data):
     data = {
         "text": data['text'], # Mensagem a ser enviada
         "type": "chat",
-        "serviceId": data['service_id'], # ID do serviço
+        "serviceId": data['service_id'], #  ID conexão
         "number": data['number'], # Número do contato(55DDD+numero)
         "userId": data['user_id'], # ID do usuário
         "origin": "bot" #bot ou user
@@ -70,7 +71,7 @@ data_msg1 = {
 }
 data_msg2 = {
     'text': 'Olá, tudo bem? Teste de mensagem.',
-    'service_id': 'bdd9f0d1-747c-41f1-a81e-709dab41a423',
+    'service_id': CONEXAO_GESTAO_SAUDE,
     'number': '5585997048236',
     'user_id': '6f4e2634-1fa5-47a3-b05c-c15a91e3d96d'
 }
@@ -84,7 +85,7 @@ def enviar_mensagem_com_pdf(url_pdf, mensagem, numero):
     data_msg_pdf = {
         "text": mensagem,
         "number": numero,
-        "serviceId": "bdd9f0d1-747c-41f1-a81e-709dab41a423",
+        "serviceId": CONEXAO_GESTAO_SAUDE,
         "file": {
             "base64": pdf_base64,
             "mimetype": "application/pdf",

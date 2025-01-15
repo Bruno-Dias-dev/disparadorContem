@@ -8,6 +8,8 @@ logging.basicConfig(level=logging.INFO)
 
 # Carregar a planilha
 file_path = "C:/Users/amirc/OneDrive - PHAROS GESTAO/Grupo Contém/9 - BI/Robozinho/Airflow/Airflow/docs/Inadimplencia_75KGLKMEXV3E241227121723.xlsx"
+
+# Use the file_path variable in your code as needed
 df = pd.read_excel(file_path)
 
 # Substituir valores vazios por None para evitar problemas no banco
@@ -47,7 +49,7 @@ for index, row in df.head(10).iterrows():
         cpf_titular = row.get('CPF Titular')
         endereco = row.get('Endereço')
         status = row.get('Status do Contrato')
-        marca_optica = row.get('Marca Óptica Titular')
+        matricula = row.get('Marca Óptica Titular')
         operadora = row.get('Operadora')
 
         # Inserção na tabela relatorio_inadimplencia
@@ -90,18 +92,18 @@ for index, row in df.head(10).iterrows():
                 status = EXCLUDED.status,
                 modified = EXCLUDED.modified
         """, (
-            titular, marca_optica, cpf_titular, endereco, status, datetime.now(), datetime.now()
+            titular, martricula, cpf_titular, endereco, status, datetime.now(), datetime.now()
         ))
 
         # Inserção na tabela plano
-        if marca_optica:
+        if matricula:
             cursor.execute("""
                 INSERT INTO plano (
                     matricula, created, modified
                 ) VALUES (%s, %s, %s)
                 ON CONFLICT (matricula) DO NOTHING
             """, (
-                marca_optica, datetime.now(), datetime.now()
+                matricula, datetime.now(), datetime.now()
             ))
 
         # Inserção na tabela superior

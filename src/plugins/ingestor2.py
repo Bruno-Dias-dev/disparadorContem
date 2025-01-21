@@ -85,7 +85,7 @@ for index, row in df.head(10).iterrows():
             INSERT INTO cliente (
                 nome, matricula, cpf_titular, endereco, status, created, modified
             ) VALUES (%s, %s, %s, %s, %s, %s, %s)
-            ON CONFLICT (matricula) DO UPDATE SET
+                matricula = EXCLUDED.matricula,
                 nome = EXCLUDED.nome,
                 cpf_titular = EXCLUDED.cpf_titular,
                 endereco = EXCLUDED.endereco,
@@ -101,7 +101,7 @@ for index, row in df.head(10).iterrows():
                 INSERT INTO plano (
                     matricula, created, modified
                 ) VALUES (%s, %s, %s)
-                ON CONFLICT (matricula) DO NOTHING
+                matricula = EXCLUDED.matricula
             """, (
                 matricula, datetime.now(), datetime.now()
             ))
@@ -113,7 +113,7 @@ for index, row in df.head(10).iterrows():
                 INSERT INTO superior (
                     nome, created, modified
                 ) VALUES (%s, %s, %s)
-                ON CONFLICT (nome) DO NOTHING
+                nome = EXCLUDED.nome,
             """, (
                 produtor, datetime.now(), datetime.now()
             ))
@@ -130,7 +130,7 @@ for index, row in df.head(10).iterrows():
                 INSERT INTO operadora (
                     nome, cnpj, pessoa_juridica, telefone_atendimento, celular_atendimento, email_atendimento, status, created, modified
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                ON CONFLICT (cnpj) DO NOTHING
+                cnpj = EXCLUDED.cnpj
             """, (
                 operadora, cnpj, pessoa_juridica, telefone_atendimento, celular_atendimento, email_atendimento, status, datetime.now(), datetime.now()
             ))

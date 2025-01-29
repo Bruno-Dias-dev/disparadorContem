@@ -21,14 +21,33 @@ def normalize_column_name(column_name):
     """Remove caracteres especiais e transforma o nome da coluna em minúsculas."""
     return re.sub(r"\W+", "_", column_name).lower().strip("_")
 
+def create_table(table_name, column_definitions, db, id_column="id"):
+    print(f"🛠 Criando tabela '{table_name}'...")
+    create_table_query = f'''
+        CREATE TABLE IF NOT EXISTS "{table_name}" ({column_definitions}, PRIMARY KEY ("{id_column}"));
+        '''
+    # Debug: Exibir a query SQL gerada
+    print("🔎 Query de criação da tabela:")
+    print(create_table_query)
 
-def import_excel_to_postgres(excel_file, sheet_name, db, table_name):
+    # Executar a criação da tabela
+    db.execute_query(create_table_query)
+    print(f"✅ Tabela '{table_name}' criada com sucesso.")
+
+def import_excel_to_postgres(excel_file, sheet_name, db, table_name, id_column="id"):
     db.connect()    
 
     print("📂 Lendo arquivo Excel...")
     df = pd.read_excel(excel_file, sheet_name=sheet_name, dtype=str)  
 
     try:
+        if table_name == "relatorio_faturas":
+            id_column = "id_fatura"
+        elif table_name == "relatorio_contratos":
+            id_column = "id_contrato"
+        else:
+            id_column = "id"
+
         column_map = {col: normalize_column_name(col) for col in df.columns}
         df.rename(columns=column_map, inplace=True)  # Renomeia as colunas do DataFrame
 
@@ -48,31 +67,28 @@ def import_excel_to_postgres(excel_file, sheet_name, db, table_name):
 
         column_definitions = ", ".join(column_definitions_list)
 
-        print(f"🛠 Criando tabela '{table_name}'...")
-        create_table_query = f'''
-        CREATE TABLE IF NOT EXISTS "{table_name}" ({column_definitions});
-        '''
-
-        # Debug: Exibir a query SQL gerada
-        print("🔎 Query de criação da tabela:")
-        print(create_table_query)
-
-        # Executar a criação da tabela
-        db.execute_query(create_table_query)
-        print(f"✅ Tabela '{table_name}' criada com sucesso.")
+        create_table(table_name, column_definitions, db, id_column)
 
         # Substituir NaN por None antes da inserção
         df = df.where(pd.notna(df), None)
 
         # Inserir dados na tabela
         for _, row in df.iterrows():
-            db.insert_table(
-                table=table_name,
-                columns=[col.replace("\"", "") for col in columns],  # Remover aspas extras
-                values=row.tolist()
-            )
+            values = row.tolist()
+            column_names = [col.replace('"', '') for col in columns]  # Remover aspas extras
+            placeholders = ", ".join(["%s"] * len(values))  # Para o INSERT
 
-        print(f"✅ Dados importados com sucesso para a tabela '{table_name}'.")
+            update_clause = ", ".join([f'"{col}" = EXCLUDED."{col}"' for col in column_names if col != id_column])
+
+            upsert_query = f"""
+            INSERT INTO "{table_name}" ({", ".join(column_names)})
+            VALUES ({placeholders})
+            ON CONFLICT ("{id_column}") DO UPDATE 
+            SET {update_clause};            """
+
+            db.execute_query(upsert_query, values)
+
+        print(f"✅ Dados inseridos ou atualizados com sucesso na tabela '{table_name}'.")
 
     except Exception as e:
         print(f"❌ Erro ao importar dados: {e}")
@@ -92,6 +108,7 @@ def main():
 
     print("📥 Importando dados do Excel para o PostgreSQL...")
     import_excel_to_postgres(excel_file, "Planilha", db, "relatorio_faturas")
+    # import_excel_to_postgres(excel_file, "Planilha", db, "relatorio_contratos")
 
 if __name__ == "__main__":
     main()

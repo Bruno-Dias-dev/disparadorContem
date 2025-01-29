@@ -1,3 +1,13 @@
+"""
+Script para importar dados de um arquivo Excel para uma tabela do PostgreSQL.
+Para executar este script, é necessário instalar as bibliotecas pandas e psycopg2.
+ - Na função main(), altere o valor da variável excel_file para o caminho absoluto do arquivo Excel.
+ - Na função import_excel_to_postgres(), altere o valor da variável table_name para o nome da tabela no banco de dados.
+   --- O padrão é "relatorio_NomeFuncionalidade", exemplo: "relatorio_contratos", ou "relatorio_faturas". 
+   --- Para cada tabela, é necessário definir um id_column diferente, que será a chave primária da tabela, linha 54.
+       Exemplo: id_column = "id_contrato" ou id_column = "id_fatura". Se precisar de mais tabelas, adicione mais elifs e id_columns. 
+"""
+
 import sys
 import os
 import re

@@ -26,9 +26,9 @@ class PostgresConnection:
                 password=self.password,
                 port=self.port
             )
-            print("Conexão estabelecida com sucesso!")
+            print("✅ Conexão estabelecida com sucesso!")
         except psycopg2.Error as e:
-            print(f"Erro ao conectar ao banco de dados: {e}")
+            print(f"❌ Erro ao conectar ao banco de dados: {e}")
             raise
 
     def close(self):
@@ -37,7 +37,7 @@ class PostgresConnection:
         """
         if self.connection:
             self.connection.close()
-            print("Conexão fechada com sucesso!")
+            print("✅ Conexão fechada com sucesso!")
 
     def execute_query(self, query, params=None):
         """

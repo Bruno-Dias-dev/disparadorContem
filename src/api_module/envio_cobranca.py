@@ -12,7 +12,7 @@ def processar_xlsx(arquivo_xlsx):
     for index, row in df.iterrows():
         url_pdf = 'https://digitalsaude.com.br/financeiro/fatura/ImprimirFatura?codigo=' + str(row['Código da Fatura'])
         mensagem = ""
-        # numero = formtatar_numero(row['Celular'])
+        numero = formtatar_numero(row['Celular'])
         # numero=''
         try:
             enviar_mensagem_com_pdf(url_pdf, mensagem, numero)

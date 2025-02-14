@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Listagem de Grupos</title>
+
+    <!-- Bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Ícones do Bootstrap -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+    />
+
+    <link rel="stylesheet" href="../static/styles.css" />
+    <script src="../static/components.js"></script>
+  </head>
+
+  <body class="container mt-5">
+    <h2 class="mb-4">Listagem de Grupos</h2>
+
+    <div class="text-end mb-3">
+      <a href="/add" class="btn btn-primary"
+        ><i class="bi bi-plus-lg"></i> Criar Novo Grupo</a
+      >
+    </div>
+
+    <div class="row" id="listaGrupos">
+      <!-- Os grupos serão inseridos aqui dinamicamente -->
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../static/listagem.js"></script>
+  </body>
+</html>

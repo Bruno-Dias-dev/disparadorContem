@@ -1,0 +1,12 @@
+body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+}
+
+textarea {
+    width: 100%;
+    height: 50px;
+}
+

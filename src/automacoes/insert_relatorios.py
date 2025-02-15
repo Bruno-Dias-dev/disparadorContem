@@ -11,6 +11,7 @@ Para executar este script, é necessário instalar as bibliotecas pandas e psyco
 import sys
 import os
 import re
+import unicodedata
 
 # Adiciona o diretório raiz ao sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
@@ -23,13 +24,19 @@ DB_CONFIG = {
     "host": "localhost",
     "database": "contem",
     "user": "postgres",
-    "password": "051295",
+    "password": "C@med2024",
+    # "password": "051295",
     "port": 5432
 }
 
-def normalize_column_name(column_name):
-    """Remove caracteres especiais e transforma o nome da coluna em minúsculas."""
-    return re.sub(r"\W+", "_", column_name).lower().strip("_")
+def normalize_column_name(column_name: str) -> str:
+    # Remove acentuação
+    column_name = unicodedata.normalize("NFKD", column_name).encode("ASCII", "ignore").decode("utf-8")
+    
+    # Substitui caracteres não alfanuméricos por _
+    column_name = re.sub(r"\W+", "_", column_name).lower().strip("_")
+    
+    return column_name
 
 def create_table(table_name, column_definitions, db, id_column="id"):
     print(f"🛠 Criando tabela '{table_name}'...")
@@ -54,6 +61,8 @@ def import_excel_to_postgres(excel_file, sheet_name, db, table_name, id_column="
         if table_name == "relatorio_faturas":
             id_column = "id_fatura"
         elif table_name == "relatorio_contratos":
+            id_column = "id_contrato"
+        elif table_name == "relatorio_inadimplencia":
             id_column = "id_contrato"
         else:
             id_column = "id"
@@ -113,12 +122,14 @@ def main():
 
     # Caminho absoluto do arquivo Excel
     # excel_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../docs/contratos.xlsx"))
-    excel_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../docs/faturas.xlsx"))
+    # excel_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../docs/faturas.xlsx"))
+    excel_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../docs/inadimplencia.xlsx"))
     print("📂 Caminho do arquivo Excel:", excel_file)
 
     print("📥 Importando dados do Excel para o PostgreSQL...")
-    import_excel_to_postgres(excel_file, "Planilha", db, "relatorio_faturas")
+    # import_excel_to_postgres(excel_file, "Planilha", db, "relatorio_faturas")
     # import_excel_to_postgres(excel_file, "Planilha", db, "relatorio_contratos")
+    import_excel_to_postgres(excel_file, "Planilha", db, "relatorio_inadimplencia")
 
 if __name__ == "__main__":
     main()

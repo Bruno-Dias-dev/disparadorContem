@@ -46,10 +46,17 @@ class PostgresConnection:
         try:
             with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
                 cursor.execute(query, params)
+                if "returning" in query.lower():
+                    result = cursor.fetchone()  
+                    return [result] if result else [] 
+                
                 if query.strip().lower().startswith("select"):
-                    return cursor.fetchall()
+                    result = cursor.fetchall()
+                    return result if result else []
                 else:
                     self.connection.commit()
+                    return None
+                
         except psycopg2.Error as e:
             print(f"Erro ao executar consulta: {e}")
             self.connection.rollback()

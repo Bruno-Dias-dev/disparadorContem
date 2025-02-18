@@ -4,9 +4,13 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pathlib import Path
 from src.routers.mensagens import router as mensagens_router  # Importando corretamente
+from src.scheduler import iniciar_scheduler
+from src.routers.agendamento_router import router as agendamento_router
 
 app = FastAPI(title="API de Mensagens e Convênios")
 
+# Iniciar o agendador de tarefas ao iniciar o FastAPI
+iniciar_scheduler()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 PAGES_DIR = BASE_DIR / "pages"
@@ -24,6 +28,7 @@ app.add_middleware(
 )
 
 app.include_router(mensagens_router)
+app.include_router(agendamento_router)
 
 # Servir páginas HTML
 @app.get("/")

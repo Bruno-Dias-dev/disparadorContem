@@ -25,3 +25,12 @@ EXECUTE FUNCTION update_modified_column();
 
 
 CREATE INDEX idx_contrato ON relatorio_contratos(id_contrato);
+
+CREATE TABLE agendamentos (
+    id SERIAL PRIMARY KEY,
+    grupo_id INTEGER NOT NULL REFERENCES grupo_mensagens(id) ON DELETE CASCADE,
+    horario_disparo TIMESTAMP NOT NULL,
+    ativo BOOLEAN DEFAULT TRUE,
+    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
+);

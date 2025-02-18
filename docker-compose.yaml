@@ -1,13 +1,8 @@
-version: '3.8'
-
 services:
   api:
     build: .
     container_name: fastapi_app
-    network_mode: "host"
-    ports:
-      - "8000:8000"
-    environment:
-      - DATABASE_URL=postgresql://postgres:postgres@localhost:5432/contem
     volumes:
-      - .:/app
+      - /var/run/postgresql:/var/run/postgresql  # Monta o socket Unix do PostgreSQL dentro do container
+    environment:
+      - DATABASE_URL=postgresql:///contem?host=/var/run/postgresql/

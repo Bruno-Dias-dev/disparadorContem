@@ -4,9 +4,10 @@ services:
   api:
     build: .
     container_name: fastapi_app
+    network_mode: "host"
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@172.17.0.1:5432/contem
+      - DATABASE_URL=postgresql://postgres:postgres@localhost:5432/contem
     volumes:
       - .:/app

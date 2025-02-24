@@ -12,6 +12,8 @@ import sys
 import os
 import re
 import unicodedata
+import argparse
+
 
 # Adiciona o diretório raiz ao sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
@@ -24,8 +26,8 @@ DB_CONFIG = {
     "host": "localhost",
     "database": "contem",
     "user": "postgres",
-    "password": "C@med2024",
-    # "password": "051295",
+    # "password": "C@med2024",
+    "password": "051295",
     "port": 5432
 }
 
@@ -116,20 +118,27 @@ def import_excel_to_postgres(excel_file, sheet_name, db, table_name, id_column="
         db.close()
 
 
-def main():
+def main(local_file, table_name):
     print("🔗 Conectando ao banco de dados...")
     db = PostgresConnection(**DB_CONFIG)
 
     # Caminho absoluto do arquivo Excel
     # excel_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../docs/contratos.xlsx"))
     # excel_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../docs/faturas.xlsx"))
-    excel_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../docs/inadimplencia.xlsx"))
+    # excel_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../docs/inadimplencia.xlsx"))
+    excel_file = os.path.abspath(os.path.join(os.path.dirname(__file__), local_file))
     print("📂 Caminho do arquivo Excel:", excel_file)
 
     print("📥 Importando dados do Excel para o PostgreSQL...")
     # import_excel_to_postgres(excel_file, "Planilha", db, "relatorio_faturas")
     # import_excel_to_postgres(excel_file, "Planilha", db, "relatorio_contratos")
-    import_excel_to_postgres(excel_file, "Planilha", db, "relatorio_inadimplencia")
+    # import_excel_to_postgres(excel_file, "Planilha", db, "relatorio_inadimplencia")
+    import_excel_to_postgres(excel_file, "Planilha", db, table_name)
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Importa relatórios para o banco de dados")
+    parser.add_argument("local_file", help="Caminho do arquivo Excel")
+    parser.add_argument("table_name", help="Nome da tabela no banco de dados")
+
+    args = parser.parse_args()
+    main(args.local_file, args.table_name)

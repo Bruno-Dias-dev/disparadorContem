@@ -1,5 +1,4 @@
 $(document).ready(async function () {
-  console.log("✅ DOM carregado!");
 
   $(".select2").select2({
     placeholder: "Selecione uma opção",
@@ -47,6 +46,8 @@ $(document).ready(async function () {
   async function salvarGrupo() {
     const grupoId = $("#grupoId").val();
     const nome = $("#nome").val();
+    const ativo = $("#ativo").val();
+    const pdf = $("#pdf").val();
 
     // Captura múltiplos valores selecionados e converte em um objeto JSON válido
     function getSelectedJson(selectId) {
@@ -58,6 +59,9 @@ $(document).ready(async function () {
     const estipulantes = getSelectedJson("estipulantes");
     const statusContratos = getSelectedJson("statusContratos");
     const alertasContratos = getSelectedJson("alertasContratos");
+    
+    console.log(ativo);
+    console.log(pdf);
 
     // Validação de campo obrigatório
     if (!nome.trim()) {
@@ -72,6 +76,8 @@ $(document).ready(async function () {
       estipulantes: estipulantes,
       status_contratos: statusContratos,
       alertas_contratos: alertasContratos,
+      ativo: ativo,
+      pdf: pdf,
     };
 
     const url = grupoId

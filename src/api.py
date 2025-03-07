@@ -15,7 +15,7 @@ iniciar_scheduler()
 BASE_DIR = Path(__file__).resolve().parent.parent
 PAGES_DIR = BASE_DIR / "pages"
 
-# Servir arquivos estáticos (CSS, JS, imagens)
+app.mount("/pages", StaticFiles(directory="pages"), name="pages")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Configuração do CORS
@@ -46,6 +46,14 @@ async def serve_grupos():
 @app.get("/edit/{group_id}")
 async def serve_edit(group_id: int):
     return FileResponse(PAGES_DIR / "edit.html")
+
+@app.get("/agendamento/add")
+async def serve_create_agenda():
+    return FileResponse("pages/agendamentos/add.html")
+
+@app.get("/agendamentos/")
+async def serve_create_agenda():
+    return FileResponse("pages/agendamentos/index.html")
 
 
 # uvicorn backend.main:app --reload

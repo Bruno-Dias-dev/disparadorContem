@@ -19,3 +19,6 @@ def listar_agendamentos_route():
 @router.delete("/agendamentos/{agendamento_id}", tags=["Agendamentos"])
 def excluir_agendamento_route(agendamento_id: int):
     return excluir_agendamento(agendamento_id)
+
+
+ 

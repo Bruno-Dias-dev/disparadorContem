@@ -5,6 +5,8 @@ CREATE TABLE grupo_mensagens (
     estipulantes JSONB,  
     status_contratos JSONB,  
     alertas_contratos JSONB,  
+    ativo BOOLEAN DEFAULT TRUE,
+    pdf BOOLEAN DEFAULT FALSE,
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
     modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
 );

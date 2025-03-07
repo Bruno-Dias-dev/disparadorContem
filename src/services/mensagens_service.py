@@ -116,19 +116,21 @@ def list_alerta_contrato():
     finally:
         db.close()
 
-def create_grupo_mensagens(nome, convenios, estipulantes, status_contratos, alertas_contratos):
+def create_grupo_mensagens(nome, convenios, estipulantes, status_contratos, alertas_contratos, ativo, pdf):
     """Cria um novo grupo de mensagens no banco de dados."""
     db = get_db()
 
     try:
         table = "grupo_mensagens"
-        columns = ["nome", "convenios", "estipulantes", "status_contratos", "alertas_contratos"]
+        columns = ["nome", "convenios", "estipulantes", "status_contratos", "alertas_contratos", "ativo", "pdf"]
         values = [
             nome,
             json.dumps(convenios) if convenios else None,  # Converte para JSON
             json.dumps(estipulantes) if estipulantes else None,
             json.dumps(status_contratos) if status_contratos else None,
             json.dumps(alertas_contratos) if alertas_contratos else None,
+            ativo,
+            pdf
         ]
 
         db.insert_table(table=table, columns=columns, values=values)

@@ -65,7 +65,9 @@ def criar_grupo(grupo: GrupoMensagensModel):
         grupo.convenios,
         grupo.estipulantes,
         grupo.status_contratos,
-        grupo.alertas_contratos
+        grupo.alertas_contratos,
+        grupo.ativo,
+        grupo.pdf
     )
     
 @router.get("/grupos", tags=["Grupos de Mensagens"])

@@ -14,6 +14,7 @@ def disparar_mensagens():
     for agendamento in agendamentos:
         horario_agendado = agendamento["horario_disparo"].strftime("%H:%M:%S")
         if horario_agendado == agora:
+            # Colocar aqui a função para disparo de mensagens
             print(f"📢 Enviando mensagem do Grupo {agendamento['grupo_id']}: Agendamento")
 
 # Configurei para rodar a cada minuto

@@ -29,12 +29,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                             <p class="text-muted">Criado em: ${formatarData(
                               agendamento.created
                             )}</p>
-                            <div class="d-flex justify-content-between">
-                            <a href="/edit/${
-                              agendamento.id
-                            }" class="btn btn-primary"><i class="bi bi-pencil"></i> Editar
-                            </a>
-                            </div>
+                            <button class="btn btn-danger btn-sm" onclick="alert('Deseja excluir o grupo?')"><i class="bi bi-trash"></i> Excluir</button>
+
                         </div>
                     </div>
                 `;

@@ -19,9 +19,11 @@ document.addEventListener("DOMContentLoaded", async function () {
       grupos.forEach((grupo) => {
         const card = document.createElement("div");
         card.className = "col-md-4 mb-3";
+        const trueFalse = grupo.ativo ? "Ativo" : "Inativo";
+        const badgeColor = grupo.ativo ? "success" : "danger";
 
         card.innerHTML = `
-                    <div class="card border-primary mb-3">
+                    <div class="card mb-3">
                         <div class="card-body">
                             <h5 class="card-title">${
                               grupo.nome
@@ -29,12 +31,14 @@ document.addEventListener("DOMContentLoaded", async function () {
                             <p class="text-muted">Criado em: ${formatarData(
                               grupo.created
                             )}</p>
-                            <div class="d-flex justify-content-between">
+                            <div class="justify-content-between">
                             <a href="/edit/${
                               grupo.id
                             }" class="btn btn-primary"><i class="bi bi-pencil"></i> Editar
                             </a>
+                            <span class="badge text-bg-${badgeColor}">${trueFalse}</span>
                             </div>
+                            
                         </div>
                     </div>
                 `;

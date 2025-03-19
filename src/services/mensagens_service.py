@@ -19,7 +19,6 @@ def get_db():
     db.connect()
     return db
 
-
 def list_tb(table: str = "faturas",page: int = 1, page_size: int = 100):
     db = get_db()    
     try:
@@ -214,3 +213,47 @@ def delete_grupo_mensagens(grupo_id):
 
     finally:
         db.close()        
+        
+def get_faturas_por_grupo(grupo_id: int):
+    """Seleciona todas as faturas associadas a um grupo_id, lidando com NULL em todas as colunas"""
+    db = get_db()
+    
+    try:
+        query = """
+    SELECT rf.código_da_fatura,celular
+    FROM relatorio_faturas rf
+    JOIN grupo_mensagens gm 
+        ON (
+            gm.convenios IS NULL 
+            OR rf.convênio_do_fatura = ANY (
+                SELECT jsonb_array_elements_text(gm.convenios->'valores')
+            )
+        )
+        AND (
+            gm.estipulantes IS NULL 
+            OR rf.estipulante = ANY (
+                SELECT jsonb_array_elements_text(gm.estipulantes->'valores')
+            )
+        )
+        AND (
+            gm.status_contratos IS NULL 
+            OR rf.status_do_contrato = ANY (
+                SELECT jsonb_array_elements_text(gm.status_contratos->'valores')
+            )
+        )
+        AND (
+            gm.alertas_contratos IS NULL 
+            OR rf.alerta = ANY (
+                SELECT jsonb_array_elements_text(gm.alertas_contratos->'valores')
+            )
+        )
+    WHERE gm.id = %s;
+    """
+        result = db.execute_query(query, (grupo_id,))    
+        return result
+
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        db.close()
+        

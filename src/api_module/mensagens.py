@@ -1,6 +1,6 @@
 import requests
 from src.api_module import auth  
-from src.api_module import *
+from src.api_module.download_pdf import *
 
 URI_MESSAGES = 'messages'
 CONEXAO_GESTAO_SAUDE = '79d8bc4b-4db2-4320-bd6b-f40fd0b6ae60'
@@ -49,7 +49,8 @@ def post_mensagem_sem_cadastro(data):
     data = {
         "text": data['text'], # Mensagem a ser enviada
         "type": "chat",
-        "serviceId": data['service_id'], #  ID conexão
+        "serviceId": "bdd9f0d1-747c-41f1-a81e-709dab41a423", 
+        # "serviceId": data['service_id'], #  ID conexão
         "number": data['number'], # Número do contato(55DDD+numero)
         "userId": data['user_id'], # ID do usuário
         "origin": "bot" #bot ou user

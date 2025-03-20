@@ -35,7 +35,7 @@ app.include_router(agendamento_router)
 async def serve_index():
     return FileResponse("pages/grupos.html")
 
-@app.get("/grupos")
+@app.get("/grupos/")
 async def serve_list():
     return FileResponse("pages/grupos.html")
 

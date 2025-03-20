@@ -90,7 +90,7 @@ def atualizar_grupo(grupo_id: int, grupo: GrupoMensagensModel):
         raise HTTPException(status_code=404, detail="Grupo não encontrado")
 
     return update_grupo_mensagens(
-        grupo_id, grupo.nome, grupo.convenios, grupo.estipulantes, grupo.status_contratos, grupo.alertas_contratos
+        grupo_id, grupo.nome, grupo.convenios, grupo.estipulantes, grupo.status_contratos, grupo.alertas_contratos, grupo.ativo, grupo.pdf
     )
 
 #  Deletar grupo (DELETE)

@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   if (!grupoId || isNaN(grupoId)) {
     alert("Nenhum ID de grupo foi informado!");
-    window.location.href = "/grupos";
+    window.location.href = "/";
     return;
   }
 
@@ -23,36 +23,33 @@ document.addEventListener("DOMContentLoaded", async function () {
       const grupo = await response.json();
       document.getElementById("grupoId").value = grupo.id;
       document.getElementById("nome").value = grupo.nome;
+      document.getElementById("ativo").checked = !!grupo.ativo;
+      document.getElementById("pdf").checked = !!grupo.pdf;
 
       // Preenche os selects com todas as opções da API e as selecionadas
       await preencherSelect("convenios", grupo.convenios, "/convenios");
       await preencherSelect(
         "estipulantes",
-        grupo.estipulantes,
+        grupo.estipulantes || { valores: [] },
         "/estipulantes"
       );
       await preencherSelect(
         "statusContratos",
-        grupo.status_contratos,
+        grupo.status_contratos || { valores: [] },
         "/status-contrato"
       );
       await preencherSelect(
         "alertasContratos",
-        grupo.alertas_contratos,
+        grupo.alertas_contratos || { valores: [] },
         "/alerta-contrato"
       );
     } catch (error) {
       alert(error.message);
-      window.location.href = "/grupos";
+      window.location.href = "/";
     }
   }
 
   async function preencherSelect(selectId, selectedValues, endpoint) {
-    console.log(
-      `🔍 DEBUG - Valores selecionados para ${selectId}:`,
-      selectedValues
-    );
-
     const select = document.getElementById(selectId);
     select.innerHTML = ""; // Limpa antes de preencher
 
@@ -76,10 +73,10 @@ document.addEventListener("DOMContentLoaded", async function () {
       const response = await fetch(`http://127.0.0.1:8000${endpoint}`);
       const allOptions = await response.json();
 
-      console.log(
-        `✅ DEBUG - Opções disponíveis para ${selectId}:`,
-        allOptions
-      );
+      // console.log(
+      //   `✅ DEBUG - Opções disponíveis para ${selectId}:`,
+      //   allOptions
+      // );
 
       // Adiciona todas as opções ao select
       allOptions.forEach((item) => {
@@ -103,43 +100,63 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   }
 
+  function getSelectedJson(selectId) {
+    const values = $(`#${selectId}`).val() || [];
+    return values.length ? { valores: values } : null; // Converte para um dicionário válido
+  }
+
   document
     .getElementById("salvarGrupoBtn")
     .addEventListener("click", async function () {
-      const nome = document.getElementById("nome").value;
-      const convenios = [
-        ...document.getElementById("convenios").selectedOptions,
-      ].map((opt) => opt.value);
-      const estipulantes = [
-        ...document.getElementById("estipulantes").selectedOptions,
-      ].map((opt) => opt.value);
-      const statusContratos = [
-        ...document.getElementById("statusContratos").selectedOptions,
-      ].map((opt) => opt.value);
-      const alertasContratos = [
-        ...document.getElementById("alertasContratos").selectedOptions,
-      ].map((opt) => opt.value);
+      const grupoId = $("#grupoId").val();
+      const nome = $("#nome").val();
+      const ativo = $("#ativo").is(":checked");
+      const pdf = $("#pdf").is(":checked");
 
+      // Captura múltiplos valores selecionados e converte em um objeto JSON válido
+      function getSelectedJson(selectId) {
+        const values = $(`#${selectId}`).val() || [];
+        return { valores: values }; 
+      }
+
+      const convenios = getSelectedJson("convenios");
+      const estipulantes = getSelectedJson("estipulantes");
+      const statusContratos = getSelectedJson("statusContratos");
+      const alertasContratos = getSelectedJson("alertasContratos");
+
+      // Validação de campo obrigatório
+      if (!nome.trim()) {
+        alert("O nome do grupo é obrigatório!");
+        return;
+      }
+
+      // Montar objeto JSON para envio
       const grupoData = {
-        nome,
-        convenios,
-        estipulantes,
+        nome: nome,
+        convenios: convenios,
+        estipulantes: estipulantes,
         status_contratos: statusContratos,
         alertas_contratos: alertasContratos,
+        ativo: ativo,
+        pdf: pdf,
       };
 
+      const url = `http://127.0.0.1:8000/grupos/${grupoId}`;
+      const method = "PUT";
+
       try {
-        const response = await fetch(`${API_URL}/grupos/${grupoId}`, {
-          method: "PUT",
+        const response = await fetch(url, {
+          method: method,
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(grupoData),
         });
 
         const result = await response.json();
+        console.log("Resultado:", result);
         alert(result.message || result.error);
-        if (!result.error) window.location.href = "/grupos";
+        if (!result.error) window.location.href = "/";
       } catch (error) {
-        console.error("Erro ao salvar grupo:", error);
+        console.error("Erro:", error);
       }
     });
 

@@ -3,7 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gerenciar Grupos de Mensagens</title>
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="/static/img/favicon.ico"
+    />
+
+    <title>Editar Grupos de Mensagens</title>
 
     <!-- Bootstrap CDN -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -20,8 +26,16 @@
     <link rel="stylesheet" type="text/css" href="/static/styles.css" />
     <script src="/static/components.js"></script>
   </head>
+  <div class="text-end mb-3">
+    <nav class="d-inline-block" aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Início</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Edição</li>
+      </ol>
+    </nav>
+  </div>
   <body class="container mt-5">
-    <h2 class="mb-4">Gerenciar Grupo de Mensagens</h2>
+    <h2 class="mb-4" style="color: #ed1c24">Editar Grupo de Mensagens</h2>
     <form id="grupoForm">
       <div class="mb-3">
         <input type="hidden" id="grupoId" />
@@ -67,10 +81,42 @@
           multiple
         ></select>
       </div>
+      <div class="mb-3">
+        <div class="form-check form-switch">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            role="switch"
+            id="ativo"
+          />
+          <label class="form-check-label" for="ativo" class="form-label"
+            >Grupo Ativo?</label
+          >
+        </div>
+      </div>
 
-      <a href="/grupos" class="btn btn-secondary">Cancelar</a>
+      <div class="mb-3">
+        <div class="form-check form-switch">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            role="switch"
+            id="pdf"
+          />
+          <label class="form-check-label" for="pdf" class="form-label"
+            >Envio de PDF?</label
+          >
+        </div>
+      </div>
 
-      <button type="button" class="btn btn-primary" id="salvarGrupoBtn">
+      <a href="/" class="btn btn-secondary">Cancelar</a>
+
+      <button
+        type="button"
+        class="btn"
+        id="salvarGrupoBtn"
+        style="background-color: #ed1c24; color: white"
+      >
         Salvar Grupo
       </button>
     </form>

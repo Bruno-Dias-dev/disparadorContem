@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" type="image/x-icon" href="/static/img/favicon.ico">
+
     <title>Listagem de Agendamentos</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -18,8 +20,17 @@
     <link rel="stylesheet" type="text/css" href="/static/styles.css" />
     <script src="/static/components.js"></script>
   </head>
+  <div class="text-end mb-3">
+    <nav class="d-inline-block" aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Início</a></li>
+        <li class="breadcrumb-item"><a href="/agendamentos/">Agendamentos</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Cadastro</li>
+      </ol>
+    </nav>
+  </div>
   <body class="container mt-5">
-    <h2 class="mb-4">Criar Agendamento de Mensagens</h2>
+    <h2 class="mb-4" style="color: #ed1c24">Cadastrar Agendamento de Mensagens</h2>
     <form>
       <div class="mb-3">
         <label for="nome" class="form-label">Escolha o grupo:</label>
@@ -40,7 +51,7 @@
         </div>
       </div>
 
-      <button type="button" class="btn btn-primary" id="salvarBtn">
+      <button type="button" class="btn" id="salvarBtn" style="background-color: #ed1c24; color: white">
         Salvar Grupo
       </button>
     </form>

@@ -106,8 +106,9 @@ def list_alerta_contrato():
     db = get_db()
     
     try:
-        query = 'SELECT DISTINCT "alerta" FROM relatorio_contratos WHERE alerta IS NOT NULL  ORDER BY "alerta"'
+        query = 'SELECT DISTINCT "alerta" FROM relatorio_contratos ORDER BY "alerta"'
         result = db.execute_query(query)
+        print(result)
         return result  
     except Exception as e:
         print(f"❌ Erro ao capturar dados: {e}")
@@ -171,14 +172,14 @@ def get_grupo_by_id(grupo_id):
     finally:
         db.close()
         
-def update_grupo_mensagens(grupo_id, nome, convenios, estipulantes, status_contratos, alertas_contratos):
+def update_grupo_mensagens(grupo_id, nome, convenios, estipulantes, status_contratos, alertas_contratos,ativo, pdf):
     """Atualiza um grupo de mensagens."""
     db = get_db()
 
     try:
         query = """
         UPDATE grupo_mensagens 
-        SET nome = %s, convenios = %s, estipulantes = %s, status_contratos = %s, alertas_contratos = %s, modified = CURRENT_TIMESTAMP 
+        SET nome = %s, convenios = %s, estipulantes = %s, status_contratos = %s, alertas_contratos = %s, ativo = %s, pdf= %s, modified = CURRENT_TIMESTAMP 
         WHERE id = %s
         """
         values = (
@@ -187,6 +188,8 @@ def update_grupo_mensagens(grupo_id, nome, convenios, estipulantes, status_contr
             json.dumps(estipulantes) if estipulantes else None,
             json.dumps(status_contratos) if status_contratos else None,
             json.dumps(alertas_contratos) if alertas_contratos else None,
+            ativo,
+            pdf,
             grupo_id
         )
         

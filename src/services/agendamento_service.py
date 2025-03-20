@@ -50,7 +50,7 @@ def listar_agendamentos():
     db = get_db()    
 
     try:
-        query = "SELECT * FROM agendamentos WHERE ativo = TRUE"
+        query = "SELECT A.*, GP.nome FROM agendamentos A INNER JOIN grupo_mensagens GP on A.grupo_id = GP.id"
         result = db.execute_query(query)
         return result
     except Exception as e:

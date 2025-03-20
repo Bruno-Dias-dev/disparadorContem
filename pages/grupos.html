@@ -3,6 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="/static/img/favicon.ico"
+    />
+
     <title>Listagem de Grupos</title>
 
     <!-- Bootstrap -->
@@ -17,33 +23,49 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
     />
 
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="/static/styles.css"
-    />
+    <link rel="stylesheet" type="text/css" href="/static/styles.css" />
+    
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous"
+    ></script>
     <script src="/static/components.js"></script>
   </head>
 
   <body class="container mt-5">
-    <h2 class="mb-4">Listagem de Grupos</h2>
-
+    <h2 class="mb-4" style="color: #ed1c24">Disparador de Cobranças</h2>
     <div class="text-end mb-3">
-      <!-- <a href="/add" class="btn btn-primary"
-        ><i class="bi bi-plus-lg"></i> Criar Novo Grupo</a
-      > -->
-      <a href="/add" class="btn btn-success"
+      <a href="/add" class="btn" style="background-color: #ed1c24; color: white"
         ><i class="bi bi-plus-lg"></i> Criar Novo Grupo</a
       >
     </div>
-
-    <div class="row" id="listaGrupos">
-      <!-- Os grupos serão inseridos aqui dinamicamente -->
+    <div class="card" style="border-color: #ed1c24">
+      <div class="card-header">
+        <h5>Grupos Cadastrados</h5>
+      </div>
+      <div class="card-body">
+        <table
+          class="table table-head-fixed text-nowrap  table-hover"
+          id="tbGrupos"
+        >
+          <thead>
+            <tr>
+              <th scope="col">Id</th>
+              <th scope="col">Nome</th>
+              <th scope="col">Ativo</th>
+              <th scope="col">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="listaGrupos"></tbody>
+        </table>
+      </div>
     </div>
+
+    <!-- Os grupos serão inseridos aqui dinamicamente -->
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/static/listagem.js"></script>
-    
   </body>
 </html>

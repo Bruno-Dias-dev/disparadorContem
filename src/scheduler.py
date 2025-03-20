@@ -9,12 +9,12 @@ scheduler = BackgroundScheduler(timezone=pytz.UTC)
 
 def disparar_mensagens():
     """Verifica os agendamentos e dispara mensagens no horário correto"""
-    agora = datetime.now().strftime("%H:%M")
+    agora = datetime.now().strftime("%d/%m/%Y %H:%M")
     print(f"🔔 Verificando agendamentos para {agora}...")
 
     agendamentos = listar_agendamentos()
     for agendamento in agendamentos:
-        horario_agendado = agendamento["horario_disparo"].strftime("%H:%M")
+        horario_agendado = agendamento["horario_disparo"].strftime("%d/%m/%Y %H:%M")
         print(f"🕒 Agendamento: {horario_agendado} | Agora: {agora}")
         if horario_agendado == agora: 
             faturas = get_faturas_por_grupo(agendamento["grupo_id"])

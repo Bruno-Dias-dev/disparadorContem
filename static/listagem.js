@@ -23,7 +23,10 @@ document.addEventListener("DOMContentLoaded", async function () {
             <td>${grupo.id}</td>
             <td>${grupo.nome}</td>
             <td><span class="badge bg-${badgeColor}">${trueFalse}</span></td>
-            <td>
+            <td>            
+              <a href="/view/${grupo.id}" class="btn bg-prim btn-sm">
+                    <i class="bi bi-eye"></i> 
+                </a>                
                 <a href="/edit/${grupo.id}" class="btn btn-primary btn-sm">
                     <i class="bi bi-pencil"></i> 
                 </a>
@@ -35,7 +38,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         listaGrupos.appendChild(row);
       });
-
     } catch (error) {
       console.error("❌ Erro ao carregar grupos:", error);
     }
@@ -58,7 +60,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   };
 
-
   listaGrupos.addEventListener("click", function (event) {
     if (event.target.closest(".btn-excluir")) {
       const id = event.target.closest(".btn-excluir").getAttribute("data-id");
@@ -70,7 +71,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 });
 
 // document.addEventListener("DOMContentLoaded", async function () {
-  
+
 //   const API_URL = "http://127.0.0.1:8000";
 //   const listaGrupos = document.getElementById("listaGrupos");
 
@@ -96,10 +97,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 //             <td><span class="badge bg-${badgeColor}">${trueFalse}</span></td>
 //             <td>
 //                 <a href="/edit/${grupo.id}" class="btn btn-primary btn-sm">
-//                     <i class="bi bi-pencil"></i> 
+//                     <i class="bi bi-pencil"></i>
 //                 </a>
 //                 <button class="btn btn-danger btn-sm" onclick="deletarGrupo(${grupo.id})">
-//                     <i class="bi bi-trash"></i> 
+//                     <i class="bi bi-trash"></i>
 //                 </button>
 //             </td>
 //         `;

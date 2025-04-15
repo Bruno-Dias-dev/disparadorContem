@@ -9,7 +9,10 @@ def criar_agendamento_route(agendamento: AgendamentoModel):
     return criar_agendamento(
         agendamento.grupo_id,
         agendamento.horario_disparo,
-        agendamento.ativo
+        agendamento.ativo,
+        str(agendamento.conexao_id),
+        str(agendamento.departamento_id),
+        agendamento.mensagem_ids
     )
 
 @router.get("/agendamentos", tags=["Agendamentos"])

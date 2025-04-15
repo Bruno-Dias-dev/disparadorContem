@@ -47,6 +47,10 @@ async def serve_grupos():
 async def serve_edit(group_id: int):
     return FileResponse(PAGES_DIR / "edit.html")
 
+@app.get("/view/{group_id}")
+async def serve_view(group_id: int):
+    return FileResponse("pages/view.html")
+
 @app.get("/agendamento/add")
 async def serve_create_agenda():
     return FileResponse("pages/agendamentos/add.html")
@@ -55,5 +59,18 @@ async def serve_create_agenda():
 async def serve_create_agenda():
     return FileResponse("pages/agendamentos/index.html")
 
+@app.get("/mensagens/")
+async def serve_list_mensagens():
+    return FileResponse("pages/mensagens/index.html")
 
-# uvicorn backend.main:app --reload
+@app.get("/mensagens/add")
+async def serve_add_mensagens():
+    return FileResponse("pages/mensagens/add.html")
+
+@app.get("/mensagens/edit/{mensagem_id}")
+async def serve_edit_mensagens():
+    return FileResponse("pages/mensagens/edit.html")
+
+
+
+# uvicorn src.api:app --reload

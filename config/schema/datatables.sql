@@ -36,3 +36,18 @@ CREATE TABLE agendamentos (
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
 );
+
+ALTER TABLE grupo_mensagens ADD COLUMN texto TEXT;
+
+CREATE TABLE mensagens (
+	id serial primary key not null,
+	mensagem text,
+	created timestamp,
+	modified timestamp
+);
+alter table mensagens add column ativo bool;
+alter table mensagens add column title varchar(250);
+alter table agendamentos add column mensagem_ids integer[];
+ALTER TABLE agendamentos ADD COLUMN conexao_id UUID;
+ALTER TABLE agendamentos ADD COLUMN departamento_id UUID;
+

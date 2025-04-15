@@ -9,3 +9,8 @@ textarea {
     width: 100%;
     height: 50px;
 }
+
+.bg-prim{
+    background-color: #ed1c24;
+    color: white;
+}

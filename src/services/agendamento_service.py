@@ -22,11 +22,10 @@ def get_db():
     db.connect()
     return db
 
-def criar_agendamento(grupo_id, horario_disparo, ativo=True):
+def criar_agendamento(grupo_id, horario_disparo, ativo, conexao_id, departamento_id, mensagem_ids=None,):
     """Cria um novo agendamento de mensagem"""
     db = PostgresConnection(**DB_CONFIG)
     db.connect()
-    
     try:
         now = datetime.now(tz)
         if isinstance(horario_disparo, str):
@@ -37,7 +36,7 @@ def criar_agendamento(grupo_id, horario_disparo, ativo=True):
         if horario_disparo < now:
             return {"error": "A data/hora de agendamento deve ser no futuro."}
 
-        db.insert_table(table="agendamentos", columns=("grupo_id", "horario_disparo", "ativo"), values=(grupo_id, horario_disparo, ativo))
+        db.insert_table(table="agendamentos", columns=("grupo_id", "horario_disparo", "ativo", "mensagem_ids", "conexao_id", "departamento_id"), values=(grupo_id, horario_disparo, ativo, mensagem_ids,str(conexao_id), str(departamento_id)))
         return { "message": "Agendamento criado com sucesso"}
     except Exception as e:
         print("❌ Erro ao criar agendamento:", e)

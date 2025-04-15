@@ -1,114 +1,162 @@
 import requests
-from src.api_module import auth  
-from src.api_module.download_pdf import *
+from typing import Dict, Any
+
+# from src.api_module import auth
+# from src.api_module.download_pdf import baixar_pdf, converter_para_base64
+import auth
+from download_pdf import baixar_pdf, converter_para_base64
 
 URI_MESSAGES = 'messages'
-CONEXAO_GESTAO_SAUDE = '79d8bc4b-4db2-4320-bd6b-f40fd0b6ae60'
+URI_SERVICES = 'services'
+URI_DEPARTMENTS = 'departments'
 
-#Listagem de mensagens
-def get_mensagens(page=1, qtd=50):
+def get_headers() -> Dict[str, str]:
     token = auth.get_access_token()
+    return {'Authorization': f'Bearer {token}'}
+
+
+def get_url(uri: str) -> str:
+    return f"{auth.url}{uri}"
+
+
+def tratar_erro(e: Exception) -> Dict[str, str]:
+    return {'error': str(e)}
+
+
+def get_mensagens(page: int = 1, qtd: int = 50) -> Dict[str, Any]:
     try:
-        headers = { 
-            'Authorization': f'Bearer {token}'
-        }
-        params = {
-            'page': page,
-            'per_page': qtd
-        }
-        url = auth.url+URI_MESSAGES
-        request = requests.get(url, headers=headers, params=params)
-        return request.json()
+        response = requests.get(
+            get_url(URI_MESSAGES),
+            headers=get_headers(),
+            params={'page': page, 'per_page': qtd}
+        )
+        return response.json()
     except Exception as e:
-        return {'error': str(e)}
+        return tratar_erro(e)
 
-#Envio de msg p/ contato cadastrado
-def post_mensagem(data):
-    token = auth.get_access_token()
-   
-    data = {
-        "text": data['text'], # Mensagem a ser enviada
+def post_mensagem(data: Dict[str, str]) -> Dict[str, Any]:
+    """
+    Envia mensagem para um contato já cadastrado.
+    """
+    payload = {
+        "text": data['text'],
         "type": "chat",
-        "contactId": data['contact_id'], # ID do serviço
-        "userId": data['user_id'], # ID do usuário
-        "origin": "bot" #bot ou user
+        "contactId": data['contact_id'],
+        "userId": data['user_id'],
+        "origin": "bot"
     }
-    try:
-        headers = { 
-            'Authorization': f'Bearer {token}'
-        }
-        url = auth.url+URI_MESSAGES
-        request = requests.post(url, headers=headers, json=data)
-        return request.json()
-    except Exception as e:
-        return {'error': str(e)}
 
-#Envio de msg p/ contato não cadastrado    
-def post_mensagem_sem_cadastro(data):
-    token = auth.get_access_token()
-    data = {
-        "text": data['text'], # Mensagem a ser enviada
+    try:
+        response = requests.post(get_url(URI_MESSAGES), headers=get_headers(), json=payload)
+        return response.json()
+    except Exception as e:
+        return tratar_erro(e)
+
+def post_mensagem_sem_cadastro(data: Dict[str, str]) -> Dict[str, Any]:
+    """
+    Envia mensagem para número ainda não cadastrado como contato.
+    """
+    payload = {
+        "text": data['text'],
         "type": "chat",
-        "serviceId": "bdd9f0d1-747c-41f1-a81e-709dab41a423", 
-        # "serviceId": data['service_id'], #  ID conexão
-        "number": data['number'], # Número do contato(55DDD+numero)
-        "userId": data['user_id'], # ID do usuário
-        "origin": "bot" #bot ou user
+        "serviceId": data['service_id'],
+        "number": data['number'],
+        "origin": "user" # ou "bot"
     }
+
     try:
-        headers = { 
-            'Authorization': f'Bearer {token}'
-        }
-        url = auth.url+URI_MESSAGES
-        request = requests.post(url, headers=headers, json=data)
-        return request.json()
+        response = requests.post(get_url(URI_MESSAGES), headers=get_headers(), json=payload)
+        return response.json()
     except Exception as e:
-        return {'error': str(e)}
+        return tratar_erro(e)
 
-data_msg1 = {    
-    'text': 'Olá, tudo bem? Teste de mensagem.',
-    'contact_id': '755b1fad-2f53-417e-84d7-fd9b2b1e82fd',
-    'user_id': '6f4e2634-1fa5-47a3-b05c-c15a91e3d96d',
-}
-data_msg2 = {
-    'text': 'Olá, tudo bem? Teste de mensagem.',
-    'service_id': CONEXAO_GESTAO_SAUDE,
-    'number': '5585997048236',
-    'user_id': '6f4e2634-1fa5-47a3-b05c-c15a91e3d96d'
-}
+def enviar_mensagem_com_pdf(data: Dict[str, str]) -> Dict[str, Any]:
+    """
+    Envia uma mensagem com um PDF anexado via WhatsApp.
 
-
-def enviar_mensagem_com_pdf(url_pdf, mensagem, numero):
-    pdf_content = baixar_pdf(url_pdf)
-    pdf_base64 = converter_para_base64(pdf_content)
-    #Inadimplentes
-    mensagem ="👋 Olá! Não identificamos em nossos registros o pagamento do seu plano de Assistência Médica e/ou odontológica. \n💭Lembramos que no 11o dia de atraso, a prestação do serviço junto à operadora será suspensa, bem como o cancelamento do contrato conforme cláusulas contratuais. \n📖 De acordo com o Art. 43, parágrafo 2º, da Lei n.º 8078/90, atrasos superiores a 10 (dez) dias resultarão no registro do seu débito no Serviço de Proteção ao Crédito - SPC. \n❌ Desconsiderar esta notificação caso o pagamento já tenha sido efetuado. \n🙏🏻 Desde já, colocamo-nos à disposição para eventuais dúvidas. Só nos chamar aqui 👇🏻"
-    #Fase 4 e 5
-    #mensagem ="👋 Olá, esperamos que você esteja bem! \n\n📱Estamos entrando em contato para informá-lo sobre a possibilidade de regularizar sua pendência financeira referente ao contrato cancelado. \n\nℹ️ Atualmente, estamos oferecendo uma condição especial, com descontos de até 50% para a quitação total do seu débito. \n\n⏳Essas condições são válidas por tempo limitado, e nossa equipe está à disposição para ajudar a resolver essa situação de maneira rápida e simples, retirando a restrição do CPF nos órgão de proteção ao Credito em 48 horas úteis. \n\n👇🏻Caso tenha interesse em aproveitar essa oportunidade ou precise de mais informações, por favor, estamos prontos para encontrar a melhor solução para você!"
-
-    data_msg_pdf = {
-        "text": mensagem,
-        "number": numero,
-        "departmentId": "919aa271-a6fa-43a7-8ec0-e9f81aab75e5",
-        "serviceId": "bdd9f0d1-747c-41f1-a81e-709dab41a423",
-        #"serviceId": "49ff100b-a917-48ca-b27d-5496c86ba655",
-        #Parametro que garante a não abertura do chamado.
-        "dontOpenTicket": "true",
-        "file": {
-            "base64": pdf_base64,
-            "mimetype": "application/pdf",
-            "name": "fatura.pdf"
-        }
-    }   
+    Parâmetros esperados em `data`:
+        - url_pdf: URL do PDF.
+        - text: Texto da mensagem.
+        - number: Número com DDI (ex: 558599999999).
+        - departmentId: ID do departamento.
+        - serviceId: ID do serviço.
+    """
+    try:
+        pdf_content = baixar_pdf(data['url_pdf'])
+        pdf_base64 = converter_para_base64(pdf_content)
         
-    token = auth.get_access_token()
-    try:
-        headers = { 
-            'Authorization': f'Bearer {token}'
+        payload = {
+            "text": data['text'],
+            "number": data['number'],
+            "departmentId": data['departmentId'],
+            "serviceId": data['serviceId'],
+            "dontOpenTicket": "true",
+            "file": {
+                "base64": pdf_base64,
+                "mimetype": "application/pdf",
+                "name": "fatura.pdf"
+            }
         }
-        url = auth.url+URI_MESSAGES
-        request = requests.post(url, headers=headers, json=data_msg_pdf)
-        return request.json()
+
+        response = requests.post(get_url(URI_MESSAGES), headers=get_headers(), json=payload)
+        return response.json()
     except Exception as e:
-        return {'error': str(e)}
+        return tratar_erro(e)
+
+def get_conexoes_ativas():
+    """
+    Obtém todas as conexões ativas e conectadas.
+    """
+    try:
+        page = 1
+        per_page = 50
+        todas_conexoes = []
+
+        while True:
+            url = get_url(f"{URI_SERVICES}?page={page}&perPage={per_page}")
+            response = requests.get(url, headers=get_headers())
+            data = response.json()
+            conexoes = data.get("data", [])
+
+            # Se não veio mais nada, fim da paginação
+            if not conexoes:
+                break
+
+            todas_conexoes.extend(conexoes)
+            page += 1
+
+        # Filtra conexões ativas e conectadas
+        conexoes_ativas = [
+            item for item in todas_conexoes
+            if item.get("archivedAt") is None
+            and item.get("deletedAt") is None
+            and item.get("data", {}).get("status", {}).get("isConnected") is True
+        ]
+
+        return conexoes_ativas
+
+    except Exception as e:
+        return tratar_erro(e)
+
+
+    except Exception as e:
+        return tratar_erro(e)
+
+def get_departamentos():
+    """
+    Obtém os departamentos disponíveis.
+    """
+    try:
+        response = requests.get(get_url(URI_DEPARTMENTS), headers=get_headers())
+        data = response.json()
+        departamentos = data.get("data", [])
+        
+        departamentos_ativos = [
+            dept for dept in departamentos
+            if dept.get("archivedAt") is None or dept.get("archivedAt") is False
+        ]
+
+        return departamentos_ativos
+    except Exception as e:
+        return tratar_erro(e)
 

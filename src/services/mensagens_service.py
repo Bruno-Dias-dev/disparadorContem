@@ -246,6 +246,7 @@ def get_faturas_por_grupo(grupo_id: int):
         )
         AND (
             gm.alertas_contratos IS NULL 
+            OR jsonb_array_length(gm.alertas_contratos->'valores') = 0 
             OR rf.alerta = ANY (
                 SELECT jsonb_array_elements_text(gm.alertas_contratos->'valores')
             )
@@ -259,4 +260,88 @@ def get_faturas_por_grupo(grupo_id: int):
         return {"error": str(e)}
     finally:
         db.close()
+
+def list_mensagens():
+    """Lista todas as mensagens."""
+    db = get_db()
+
+    try:
+        query = "SELECT * FROM mensagens ORDER BY id DESC"
+        result = db.execute_query(query)
+        return result
+
+    except Exception as e:
+        return {"error": str(e)}
+
+    finally:
+        db.close()        
+
+def create_mensagem(mensagem, ativo, titulo):
+    """Cria uma nova mensagem."""
+    db = get_db()
+
+    try:
+        table = "mensagens"
+        columns = ["mensagem", "ativo", "title"]
+        values = [mensagem, ativo, titulo]
+
+        db.insert_table(table=table, columns=columns, values=values)
+        return {"message": "Mensagem criada com sucesso!"}
+
+    except Exception as e:
+        print(f"❌ Erro ao inserir mensagem: {e}")
+        return {"error": str(e)}
+
+    finally:
+        db.close()
+
+def get_msg_by_id(mensagem_id):
+    """Busca a mensagem pelo ID."""
+    db = get_db()
+
+    try:
+        query = "SELECT * FROM mensagens WHERE id = %s"
+        result = db.execute_query(query, (mensagem_id,))
+        return result[0] if result else None
+
+    except Exception as e:
+        return {"error": str(e)}
+
+    finally:
+        db.close()
         
+def update_mensagens(id, mensagem, ativo, titulo):
+    """Atualiza uma mensagem."""
+    db = get_db()
+
+    try:
+        query = """
+        UPDATE mensagens 
+        SET mensagem = %s, ativo = %s, title = %s, modified = CURRENT_TIMESTAMP 
+        WHERE id = %s
+        """
+        values = (mensagem, ativo, titulo, id)
+
+        db.execute_query(query, values)
+        return {"message": "Mensagem atualizada com sucesso!"}
+
+    except Exception as e:
+        return {"error": str(e)}
+
+    finally:
+        db.close()
+
+def delete_mensagem(mensagem_id):
+    """Remove uma mensagem."""
+    db = get_db()
+
+    try:
+        query = "DELETE FROM mensagens WHERE id = %s"
+        db.execute_query(query, (mensagem_id,))
+        return {"message": "Mensagem removida com sucesso!"}
+
+    except Exception as e:
+        return {"error": str(e)}
+
+    finally:
+        db.close()

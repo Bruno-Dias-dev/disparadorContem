@@ -1,13 +1,26 @@
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
+from starlette.middleware.sessions import SessionMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pathlib import Path
 from src.routers.mensagens import router as mensagens_router  # Importando corretamente
 from src.scheduler import iniciar_scheduler
 from src.routers.agendamento_router import router as agendamento_router
+from src.api_module import auth
+from src.middlewares.redirect_unauthorized import RedirectUnauthorizedMiddleware
+from src.routers.usuario_route import router as usuario_route
 
-app = FastAPI(title="API de Mensagens e Convênios")
+import os
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
+app = FastAPI(
+    title="API de Disparador de Mensagens", 
+    version="1.0.0"
+)
 
 # Iniciar o agendador de tarefas ao iniciar o FastAPI
 iniciar_scheduler()
@@ -18,6 +31,11 @@ PAGES_DIR = BASE_DIR / "pages"
 app.mount("/pages", StaticFiles(directory="pages"), name="pages")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+app.add_middleware(RedirectUnauthorizedMiddleware)
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=os.getenv("SECRET_KEY", "fallback-key")
+)
 # Configuração do CORS
 app.add_middleware(
     CORSMiddleware,
@@ -27,10 +45,16 @@ app.add_middleware(
     allow_headers=["*"],  
 )
 
+app.include_router(auth.router)
 app.include_router(mensagens_router)
 app.include_router(agendamento_router)
+app.include_router(usuario_route)
 
 # Servir páginas HTML
+@app.get("/login")
+async def serve_login():
+    return FileResponse("pages/login.html")
+
 @app.get("/")
 async def serve_index():
     return FileResponse("pages/grupos.html")
@@ -55,9 +79,15 @@ async def serve_view(group_id: int):
 async def serve_create_agenda():
     return FileResponse("pages/agendamentos/add.html")
 
-@app.get("/agendamentos/")
-async def serve_create_agenda():
-    return FileResponse("pages/agendamentos/index.html")
+# @app.get("/agendamentos/")
+# async def serve_create_agenda():
+#     return FileResponse("pages/agendamentos/index.html")
+# @app.get("/agendamentos/")
+# async def serve_create_agenda(request: Request, usuario: str = Depends(verificar_usuario_logado)):
+#     return templates.TemplateResponse("agendamentos/index.html", {
+#         "request": request,
+#         "usuario": usuario
+#     })
 
 @app.get("/mensagens/")
 async def serve_list_mensagens():

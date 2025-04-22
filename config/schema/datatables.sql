@@ -51,3 +51,13 @@ alter table agendamentos add column mensagem_ids integer[];
 ALTER TABLE agendamentos ADD COLUMN conexao_id UUID;
 ALTER TABLE agendamentos ADD COLUMN departamento_id UUID;
 
+CREATE TABLE usuarios(
+    id serial primary key not null,
+    nome varchar(250),
+    email varchar(250),
+    senha varchar(250),
+    ativo bool,
+    created timestamp,
+    modified timestamp
+);
+

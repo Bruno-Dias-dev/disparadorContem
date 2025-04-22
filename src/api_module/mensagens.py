@@ -3,8 +3,8 @@ from typing import Dict, Any
 
 # from src.api_module import auth
 # from src.api_module.download_pdf import baixar_pdf, converter_para_base64
-import auth
-from download_pdf import baixar_pdf, converter_para_base64
+from src.api_module import auth
+from src.api_module.download_pdf import baixar_pdf, converter_para_base64
 
 URI_MESSAGES = 'messages'
 URI_SERVICES = 'services'

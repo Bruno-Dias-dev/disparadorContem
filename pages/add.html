@@ -3,7 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gerenciar Grupos de Mensagens</title>
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="/static/img/favicon.ico"
+    />
+
+    <title>Cadastrar Grupos de Mensagens</title>
 
     <!-- Bootstrap CDN -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -17,63 +23,117 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="../static/styles.css" />
+    <link rel="stylesheet" type="text/css" href="/static/styles.css" />
+    <script src="/static/components.js"></script>
   </head>
+  <div class="text-end mb-3">
+    <nav class="d-inline-block" aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Início</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Cadastro</li>
+      </ol>
+    </nav>
+  </div>
   <body class="container mt-5">
-    <h2 class="mb-4">Gerenciar Grupo de Mensagens</h2>
-    <form id="grupoForm">
-      <div class="mb-3">
-        <label for="nome" class="form-label">Nome do Grupo:</label>
-        <input type="text" id="nome" class="form-control" required />
-      </div>
+    <h2 class="mb-4" style="color: #ed1c24">Cadastrar Grupo de Mensagens</h2>
+    <div class="card" style="border-color: #ed1c24; box-shadow: inset">
+      <div class="card-body">
+        <div class="card-header">
+          <h5>Escolha o grupo de Mensagens</h5>
+        </div>
+        <form id="grupoForm">
+          <div class="mb-3">
+            <label for="nome" class="form-label">Nome do Grupo:</label>
+            <input type="text" id="nome" class="form-control" required />
+          </div>
 
-      <div class="mb-3">
-        <label for="convenios" class="form-label">Convênios:</label>
-        <select
-          id="convenios"
-          size="1"
-          class="form-select select2"
-          multiple
-        ></select>
-      </div>
+          <div class="mb-3">
+            <label for="convenios" class="form-label">Convênios:</label>
+            <select
+              id="convenios"
+              size="1"
+              class="form-select select2"
+              multiple
+            ></select>
+          </div>
 
-      <div class="mb-3">
-        <label for="estipulantes" class="form-label">Estipulantes:</label>
-        <select id="estipulantes" class="form-select select2" multiple></select>
-      </div>
+          <div class="mb-3">
+            <label for="estipulantes" class="form-label">Estipulantes:</label>
+            <select
+              id="estipulantes"
+              class="form-select select2"
+              multiple
+            ></select>
+          </div>
 
-      <div class="mb-3">
-        <label for="statusContratos" class="form-label"
-          >Status dos Contratos:</label
-        >
-        <select
-          id="statusContratos"
-          class="form-select select2"
-          multiple
-        ></select>
-      </div>
+          <div class="mb-3">
+            <label for="statusContratos" class="form-label"
+              >Status dos Contratos:</label
+            >
+            <select
+              id="statusContratos"
+              class="form-select select2"
+              multiple
+            ></select>
+          </div>
 
-      <div class="mb-3">
-        <label for="alertasContratos" class="form-label"
-          >Alertas de Contratos:</label
-        >
-        <select
-          id="alertasContratos"
-          class="form-select select2"
-          multiple
-        ></select>
-      </div>
+          <div class="mb-3">
+            <label for="alertasContratos" class="form-label"
+              >Alertas de Contratos:</label
+            >
+            <select
+              id="alertasContratos"
+              class="form-select select2"
+              multiple
+            ></select>
+          </div>
 
-      <button type="button" class="btn btn-secondary" id="limparCamposBtn">
-        Limpar
-      </button>
-      <button type="button" class="btn btn-primary" id="salvarGrupoBtn">
-        Salvar Grupo
-      </button>
-    </form>
+          <div class="mb-3">
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="ativo"
+                checked
+              />
+              <label class="form-check-label" for="ativo" class="form-label"
+                >Grupo Ativo?</label
+              >
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="pdf"
+              />
+              <label class="form-check-label" for="pdf" class="form-label"
+                >Envio de PDF?</label
+              >
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-secondary" id="limparCamposBtn">
+            Limpar
+          </button>
+          <button
+            type="button"
+            class="btn"
+            id="salvarGrupoBtn"
+            style="background-color: #ed1c24; color: white"
+          >
+            Salvar Grupo
+          </button>
+        </form>
+      </div>
+    </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../static/scripts.js"></script>
+    <script src="/static/scripts.js"></script>
   </body>
 </html>

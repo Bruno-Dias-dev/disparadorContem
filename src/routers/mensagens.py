@@ -3,6 +3,7 @@ from src.models.mensagem_model import MensagemModel
 from src.models.grupo_mensagens_model import GrupoMensagensModel
 from src.services.api_client import get_mensagens 
 from src.services.mensagens_service import *
+from src.api_module.mensagens import get_conexoes_ativas, get_departamentos
 
 router = APIRouter()
 
@@ -20,10 +21,50 @@ def listar_tb_contratos(table: str, page: int, page_size: int):
         return {"error": "Formato inesperado na resposta."}
     
 # Rota para Mensagens
-@router.get("/messages", response_model=MensagemModel, tags=["Mensagens"])
-def listar_mensagens(page: int = 1, qtd: int = 50):
-    return get_mensagens(page, qtd)
+# @router.get("/messages", response_model=MensagemModel, tags=["Mensagens"])
+# def listar_mensagens(page: int = 1, qtd: int = 50):
+#     return get_mensagens(page, qtd)
 
+@router.get("/mensagens", tags=["Mensagens"])
+def listar_mensagens():
+    return list_mensagens()
+
+@router.post("/mensagens", tags=["Mensagens"])
+def criar_mensagem(mensagem: MensagemModel):
+    return create_mensagem(
+        mensagem.mensagem,
+        mensagem.ativo,
+        mensagem.titulo,
+)
+
+@router.put("/mensagens/{mensagem_id}", tags=["Mensagens"])
+def atualizar_mensagem(mensagem_id: int, mensagem: MensagemModel):
+    msg_existente = get_msg_by_id(mensagem_id)
+    if not msg_existente:
+        raise HTTPException(status_code=404, detail="Grupo não encontrado")
+
+    return update_mensagens(
+        mensagem_id,
+        mensagem.mensagem,
+        mensagem.ativo,
+        mensagem.titulo,
+    )   
+    
+@router.get("/mensagens/view/{mensagem_id}", tags=["Mensagens"])
+def get_mensagem(mensagem_id: int):
+    msg_existente = get_msg_by_id(mensagem_id)
+    if not msg_existente:
+        raise HTTPException(status_code=404, detail="Mensagem não encontrada")
+    return msg_existente 
+
+@router.delete("/mensagens/{mensagem_id}", tags=["Mensagens"])
+def deletar_mensagem(mensagem_id: int):
+    msg_existente = get_msg_by_id(mensagem_id)
+    if not msg_existente:
+        raise HTTPException(status_code=404, detail="Mensagem não encontrada")
+
+    return delete_mensagem(mensagem_id)
+    
 # Rota para Convênios
 @router.get("/convenios", tags=["Convênios"])
 def listar_convenios():
@@ -65,7 +106,9 @@ def criar_grupo(grupo: GrupoMensagensModel):
         grupo.convenios,
         grupo.estipulantes,
         grupo.status_contratos,
-        grupo.alertas_contratos
+        grupo.alertas_contratos,
+        grupo.ativo,
+        grupo.pdf
     )
     
 @router.get("/grupos", tags=["Grupos de Mensagens"])
@@ -88,7 +131,7 @@ def atualizar_grupo(grupo_id: int, grupo: GrupoMensagensModel):
         raise HTTPException(status_code=404, detail="Grupo não encontrado")
 
     return update_grupo_mensagens(
-        grupo_id, grupo.nome, grupo.convenios, grupo.estipulantes, grupo.status_contratos, grupo.alertas_contratos
+        grupo_id, grupo.nome, grupo.convenios, grupo.estipulantes, grupo.status_contratos, grupo.alertas_contratos, grupo.ativo, grupo.pdf
     )
 
 #  Deletar grupo (DELETE)
@@ -99,3 +142,20 @@ def deletar_grupo(grupo_id: int):
         raise HTTPException(status_code=404, detail="Grupo não encontrado")
 
     return delete_grupo_mensagens(grupo_id)
+
+@router.get("/grupos/{grupo_id}/faturas", tags=["Grupos de Mensagens"])
+def listar_faturas_por_grupo(grupo_id: int):
+    grupo = get_grupo_by_id(grupo_id)
+    if not grupo:
+        raise HTTPException(status_code=404, detail="Grupo não encontrado")
+    
+    faturas = get_faturas_por_grupo(grupo_id)
+    return faturas
+
+@router.get("/conexoes-ativas", tags=["Conexões Ativas"])
+def listar_conexoes_ativas():
+    return get_conexoes_ativas()
+
+@router.get("/departamentos", tags=["Departamentos"])
+def listar_departamentos():
+    return get_departamentos()

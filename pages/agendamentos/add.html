@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="/static/img/favicon.ico"
+    />
+
+    <title>Listagem de Agendamentos</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" type="text/css" href="/static/styles.css" />
+    
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.js"></script>
+    <script src="/static/components.js"></script>
+  </head>
+  <div class="text-end mb-3">
+    <nav class="d-inline-block" aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Início</a></li>
+        <li class="breadcrumb-item">
+          <a href="/agendamentos/">Agendamentos</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Cadastro</li>
+      </ol>
+    </nav>
+  </div>
+  <body class="container mt-5">
+    <h2 class="mb-4" style="color: #ed1c24">
+      Cadastrar Agendamento de Mensagens
+    </h2>
+    <form>
+      <div class="mb-3">
+        <label for="nome" class="form-label">Escolha o grupo:</label>
+        <select id="grupos" size="1" class="form-select select2"></select>
+      </div>
+      <div class="mb-3">
+        <label for="nome" class="form-label">Escolha a conexão:</label>
+        <select id="conexao" size="1" class="form-select select2"></select>
+      </div>
+      <div class="mb-3">
+        <label for="nome" class="form-label">Escolha o departamento:</label>
+        <select id="departamento" size="1" class="form-select select2"></select>
+      </div>
+      <div class="mb-3">
+        <label for="nome" class="form-label">Data</label>
+        <input
+          type="datetime-local"
+          name="horario_agendamento"
+          id="horarioAgendamento"
+          class="form-control"
+          required
+        />
+      </div>
+      <div class="mb-3">
+        <div class="form-check form-switch">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            role="switch"
+            id="ativo"
+            checked
+          />
+          <label class="form-check-label" for="ativo" class="form-label"
+            >Agendamento Ativo?</label
+          >
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="mensagens" class="form-label">Mensagens:</label>
+        <select
+          id="mensagens"
+          size="1"
+          class="form-select select2"
+          multiple
+        ></select>
+      </div>
+      <button
+        type="button"
+        class="btn"
+        id="salvarBtn"
+        style="background-color: #ed1c24; color: white"
+      >
+        Salvar Agendamento
+      </button>
+    </form>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/create_agendamento.js"></script>
+  </body>
+</html>
+<script>
+  $(document).ready(function () {
+    $('#summernote').summernote();
+  });
+</script>

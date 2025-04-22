@@ -6,3 +6,5 @@ class GrupoMensagensModel(BaseModel):
     estipulantes: dict = None
     status_contratos: dict = None
     alertas_contratos: dict = None
+    ativo: bool = True
+    pdf: bool = False

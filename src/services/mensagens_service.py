@@ -19,7 +19,6 @@ def get_db():
     db.connect()
     return db
 
-
 def list_tb(table: str = "faturas",page: int = 1, page_size: int = 100):
     db = get_db()    
     try:
@@ -107,8 +106,9 @@ def list_alerta_contrato():
     db = get_db()
     
     try:
-        query = 'SELECT DISTINCT "alerta" FROM relatorio_contratos WHERE alerta IS NOT NULL  ORDER BY "alerta"'
+        query = 'SELECT DISTINCT "alerta" FROM relatorio_contratos ORDER BY "alerta"'
         result = db.execute_query(query)
+        print(result)
         return result  
     except Exception as e:
         print(f"❌ Erro ao capturar dados: {e}")
@@ -116,19 +116,21 @@ def list_alerta_contrato():
     finally:
         db.close()
 
-def create_grupo_mensagens(nome, convenios, estipulantes, status_contratos, alertas_contratos):
+def create_grupo_mensagens(nome, convenios, estipulantes, status_contratos, alertas_contratos, ativo, pdf):
     """Cria um novo grupo de mensagens no banco de dados."""
     db = get_db()
 
     try:
         table = "grupo_mensagens"
-        columns = ["nome", "convenios", "estipulantes", "status_contratos", "alertas_contratos"]
+        columns = ["nome", "convenios", "estipulantes", "status_contratos", "alertas_contratos", "ativo", "pdf"]
         values = [
             nome,
             json.dumps(convenios) if convenios else None,  # Converte para JSON
             json.dumps(estipulantes) if estipulantes else None,
             json.dumps(status_contratos) if status_contratos else None,
             json.dumps(alertas_contratos) if alertas_contratos else None,
+            ativo,
+            pdf
         ]
 
         db.insert_table(table=table, columns=columns, values=values)
@@ -170,14 +172,14 @@ def get_grupo_by_id(grupo_id):
     finally:
         db.close()
         
-def update_grupo_mensagens(grupo_id, nome, convenios, estipulantes, status_contratos, alertas_contratos):
+def update_grupo_mensagens(grupo_id, nome, convenios, estipulantes, status_contratos, alertas_contratos,ativo, pdf):
     """Atualiza um grupo de mensagens."""
     db = get_db()
 
     try:
         query = """
         UPDATE grupo_mensagens 
-        SET nome = %s, convenios = %s, estipulantes = %s, status_contratos = %s, alertas_contratos = %s, modified = CURRENT_TIMESTAMP 
+        SET nome = %s, convenios = %s, estipulantes = %s, status_contratos = %s, alertas_contratos = %s, ativo = %s, pdf= %s, modified = CURRENT_TIMESTAMP 
         WHERE id = %s
         """
         values = (
@@ -186,6 +188,8 @@ def update_grupo_mensagens(grupo_id, nome, convenios, estipulantes, status_contr
             json.dumps(estipulantes) if estipulantes else None,
             json.dumps(status_contratos) if status_contratos else None,
             json.dumps(alertas_contratos) if alertas_contratos else None,
+            ativo,
+            pdf,
             grupo_id
         )
         
@@ -212,3 +216,132 @@ def delete_grupo_mensagens(grupo_id):
 
     finally:
         db.close()        
+        
+def get_faturas_por_grupo(grupo_id: int):
+    """Seleciona todas as faturas associadas a um grupo_id, lidando com NULL em todas as colunas"""
+    db = get_db()
+    
+    try:
+        query = """
+    SELECT rf.código_da_fatura,celular
+    FROM relatorio_faturas rf
+    JOIN grupo_mensagens gm 
+        ON (
+            gm.convenios IS NULL 
+            OR rf.convênio_do_fatura = ANY (
+                SELECT jsonb_array_elements_text(gm.convenios->'valores')
+            )
+        )
+        AND (
+            gm.estipulantes IS NULL 
+            OR rf.estipulante = ANY (
+                SELECT jsonb_array_elements_text(gm.estipulantes->'valores')
+            )
+        )
+        AND (
+            gm.status_contratos IS NULL 
+            OR rf.status_do_contrato = ANY (
+                SELECT jsonb_array_elements_text(gm.status_contratos->'valores')
+            )
+        )
+        AND (
+            gm.alertas_contratos IS NULL 
+            OR jsonb_array_length(gm.alertas_contratos->'valores') = 0 
+            OR rf.alerta = ANY (
+                SELECT jsonb_array_elements_text(gm.alertas_contratos->'valores')
+            )
+        )
+    WHERE gm.id = %s;
+    """
+        result = db.execute_query(query, (grupo_id,))    
+        return result
+
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        db.close()
+
+def list_mensagens():
+    """Lista todas as mensagens."""
+    db = get_db()
+
+    try:
+        query = "SELECT * FROM mensagens ORDER BY id DESC"
+        result = db.execute_query(query)
+        return result
+
+    except Exception as e:
+        return {"error": str(e)}
+
+    finally:
+        db.close()        
+
+def create_mensagem(mensagem, ativo, titulo):
+    """Cria uma nova mensagem."""
+    db = get_db()
+
+    try:
+        table = "mensagens"
+        columns = ["mensagem", "ativo", "title"]
+        values = [mensagem, ativo, titulo]
+
+        db.insert_table(table=table, columns=columns, values=values)
+        return {"message": "Mensagem criada com sucesso!"}
+
+    except Exception as e:
+        print(f"❌ Erro ao inserir mensagem: {e}")
+        return {"error": str(e)}
+
+    finally:
+        db.close()
+
+def get_msg_by_id(mensagem_id):
+    """Busca a mensagem pelo ID."""
+    db = get_db()
+
+    try:
+        query = "SELECT * FROM mensagens WHERE id = %s"
+        result = db.execute_query(query, (mensagem_id,))
+        return result[0] if result else None
+
+    except Exception as e:
+        return {"error": str(e)}
+
+    finally:
+        db.close()
+        
+def update_mensagens(id, mensagem, ativo, titulo):
+    """Atualiza uma mensagem."""
+    db = get_db()
+
+    try:
+        query = """
+        UPDATE mensagens 
+        SET mensagem = %s, ativo = %s, title = %s, modified = CURRENT_TIMESTAMP 
+        WHERE id = %s
+        """
+        values = (mensagem, ativo, titulo, id)
+
+        db.execute_query(query, values)
+        return {"message": "Mensagem atualizada com sucesso!"}
+
+    except Exception as e:
+        return {"error": str(e)}
+
+    finally:
+        db.close()
+
+def delete_mensagem(mensagem_id):
+    """Remove uma mensagem."""
+    db = get_db()
+
+    try:
+        query = "DELETE FROM mensagens WHERE id = %s"
+        db.execute_query(query, (mensagem_id,))
+        return {"message": "Mensagem removida com sucesso!"}
+
+    except Exception as e:
+        return {"error": str(e)}
+
+    finally:
+        db.close()

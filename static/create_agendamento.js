@@ -23,13 +23,14 @@ $(document).ready(async function () {
         data.forEach((item) => {
           select.append(new Option(item.nome, item.id));
         });
-      }
-      else if (endpoint == "/mensagens") {
+      } else if (endpoint == "/mensagens") {
         data.forEach((item) => {
           select.append(new Option(item.title, item.id));
         });
-      }
-      else if (endpoint == "/conexoes-ativas" || endpoint == "/departamentos") {
+      } else if (
+        endpoint == "/conexoes-ativas" ||
+        endpoint == "/departamentos"
+      ) {
         data.forEach((item) => {
           select.append(new Option(item.name, item.id));
         });
@@ -54,7 +55,7 @@ $(document).ready(async function () {
     const conexaoId = $("#conexao").val();
     const departamentoId = $("#departamento").val();
 
-    const url = API_URL + "/agendamentos";
+    const url = API_URL + "/api/agendamentos";
     const method = "POST";
 
     const grupoData = {
@@ -65,14 +66,14 @@ $(document).ready(async function () {
       departamento_id: departamentoId,
       mensagem_ids: mensagens,
     };
-
+    
     try {
       const response = await fetch(url, {
         method: method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(grupoData),
       });
-
+      
       const result = await response.json();
       alert(result.message || result.error);
       if (!result.error) window.location.href = "/agendamentos/";

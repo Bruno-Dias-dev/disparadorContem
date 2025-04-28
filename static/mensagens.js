@@ -22,9 +22,7 @@ $(document).ready(async function () {
         ativo,
         titulo
       };
-  
-      console.log("Enviando dados:", mensagemData);
-  
+    
       try {
         const response = await fetch(`${API_URL}/mensagens`, {
           method: "POST",

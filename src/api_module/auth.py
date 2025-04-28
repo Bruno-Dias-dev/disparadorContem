@@ -3,12 +3,13 @@ from config.conn import PostgresConnection
 import requests
 from dotenv import load_dotenv
 import time
-from fastapi import APIRouter, Request, Form, status
+from fastapi import APIRouter, Request, Form, Depends, status
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from fastapi import Request
-import traceback
-import hashlib
+from src.models.usuario_model import UsuarioModel as Usuario
+from src.utils.security import verificar_senha
+from sqlalchemy.orm import Session
 
 router = APIRouter()
 
@@ -18,10 +19,6 @@ URI_LOGIN = 'oauth/token'
 
 access_token = None
 token_expires = None
-
-class LoginData(BaseModel):
-    email: str
-    password: str
 
 DB_CONFIG = {
     "host": os.getenv("DB_HOST"),
@@ -61,29 +58,26 @@ def get_access_token():
         access_token = login()
     return access_token
 
-@router.post("/login", tags=["Login"]) 
-def login_default(data: LoginData):
-    db = PostgresConnection(**DB_CONFIG)
+@router.post("/login", tags=["Usuário"]) 
+async def login_default(request: Request, email: str = Form(...), senha: str = Form(...)):
+    query = "SELECT * FROM usuarios WHERE email = %s"
+    db = get_db()
     db.connect()
     
-    try:
-        senha_hash = hashlib.sha256(data.password.encode()).hexdigest()
-        query = "SELECT * FROM usuarios WHERE email = %s AND senha = %s"
-        result = db.execute_query(query, (data.email, senha_hash))
+    usuario = db.execute_query(query, (email,))
+    
+    if not usuario:
+        return RedirectResponse(url="/login?erro=1", status_code=status.HTTP_302_FOUND)
 
-        if result:
-            requests.request.session['usuario'] = result[0]['email']
-            return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
-        else:
-            return RedirectResponse(url="/login?erro=1", status_code=status.HTTP_302_FOUND)
-    except Exception as e:
-        print("🚨 ERRO NO LOGIN:", e)
-        traceback.print_exc()
-        return {"erro": str(e)}
-    finally:
-        db.close()
+    usuario = usuario[0]
+
+    if not verificar_senha(senha, usuario["senha"]):  # compara com hash do banco
+        return RedirectResponse(url="/login?erro=1", status_code=status.HTTP_302_FOUND)
+
+    request.session["user"] = {"id": usuario["id"], "email": usuario["email"]}
+    return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
 
 @router.get("/logout")
-def logout(request: Request):
-    request.session.pop("usuario", None) 
-    return RedirectResponse(url="/login", status_code=302) 
+async def logout(request: Request):
+    request.session.clear()
+    return RedirectResponse(url="/login", status_code=status.HTTP_302_FOUND)

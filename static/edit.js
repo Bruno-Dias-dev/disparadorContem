@@ -72,12 +72,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       // Buscar todas as opções da API
       const response = await fetch(`http://127.0.0.1:8000${endpoint}`);
       const allOptions = await response.json();
-
-      // console.log(
-      //   `✅ DEBUG - Opções disponíveis para ${selectId}:`,
-      //   allOptions
-      // );
-
+    
       // Adiciona todas as opções ao select
       allOptions.forEach((item) => {
         const value = Object.values(item)[0]; // Pega o valor do JSON retornado
@@ -152,7 +147,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
 
         const result = await response.json();
-        console.log("Resultado:", result);
         alert(result.message || result.error);
         if (!result.error) window.location.href = "/";
       } catch (error) {

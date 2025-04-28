@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   async function carregarAgendamentos() {
     try {
-      const response = await fetch(`${API_URL}/agendamentos`);
+      const response = await fetch(`${API_URL}/api/agendamentos/`);
       const agendamentos = await response.json();
 
       if (agendamentos.length === 0) {
@@ -36,7 +36,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         listaAgendamentos.appendChild(card);
       });
     } catch (error) {
-      console.error("❌ Erro ao carregar grupos:", error);
+      console.error("❌ Erro ao carregar agendamentos:", error);
+      listaAgendamentos.innerHTML = `<p class="text-danger">Erro ao carregar agendamentos.</p>`;
     }
   }
 

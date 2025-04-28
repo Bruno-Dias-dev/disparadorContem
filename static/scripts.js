@@ -62,8 +62,6 @@ $(document).ready(async function () {
       pdf,
     };
 
-    console.log("Enviando dados:", grupoData);
-
     try {
       const response = await fetch(`${API_URL}/grupos`, {
         method: "POST",

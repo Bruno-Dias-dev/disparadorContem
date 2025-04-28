@@ -21,7 +21,7 @@ def get_db():
     return db
 
 
-def cadastrar_usuario(usuario: UsuarioModel):
+def cadastrar_usuario(usuario: UsuarioModel, tags=["Usuário"]):
     db = get_db()
     try:
        # Verificar se o e-mail já existe
@@ -32,7 +32,7 @@ def cadastrar_usuario(usuario: UsuarioModel):
 
         senha_hash = criptografar_senha(usuario.senha)
         table = "usuarios"
-        columns = ["nome", "email", "senha", "ativo", "created","modified"]
+        columns = ["nome", "email", "senha", "ativo", "created", "modified"]
         values = (usuario.nome, usuario.email, senha_hash, usuario.ativo, datetime.now(), datetime.now())
         
         db.insert_table(table=table, columns=columns, values=values)

@@ -32,6 +32,7 @@ app.mount("/pages", StaticFiles(directory="pages"), name="pages")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.add_middleware(RedirectUnauthorizedMiddleware)
+
 app.add_middleware(
     SessionMiddleware,
     secret_key=os.getenv("SECRET_KEY", "fallback-key")
@@ -79,15 +80,9 @@ async def serve_view(group_id: int):
 async def serve_create_agenda():
     return FileResponse("pages/agendamentos/add.html")
 
-# @app.get("/agendamentos/")
-# async def serve_create_agenda():
-#     return FileResponse("pages/agendamentos/index.html")
-# @app.get("/agendamentos/")
-# async def serve_create_agenda(request: Request, usuario: str = Depends(verificar_usuario_logado)):
-#     return templates.TemplateResponse("agendamentos/index.html", {
-#         "request": request,
-#         "usuario": usuario
-#     })
+@app.get("/agendamentos/")
+async def serve_create_agenda():
+    return FileResponse("pages/agendamentos/index.html")
 
 @app.get("/mensagens/")
 async def serve_list_mensagens():

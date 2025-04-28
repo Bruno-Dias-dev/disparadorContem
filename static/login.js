@@ -1,26 +1,28 @@
-document.getElementById("login-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-  
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-  
-    const response = await fetch("http://127.0.0.1:8000/login", {
+async function login() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const response = await fetch("http://127.0.0.1:8000/login", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password })
-    });
-  
-    const resultado = document.getElementById("resultado");
-  
-    if (response.ok) {
-      const data = await response.json();
-      localStorage.setItem("token", data.token);
-      resultado.innerText = "Login bem-sucedido!";
-      // redirecionar ou fazer algo após o login
-    } else {
-      resultado.innerText = "Erro no login. Verifique suas credenciais.";
-    }
   });
-  
+
+  const data = await response.json();
+  if (data.access_token) {
+      localStorage.setItem("token", data.access_token);
+      alert("Login realizado com sucesso!");
+  } else {
+      alert("Falha no login!");
+  }
+}
+
+async function acessarProtegido() {
+  const token = localStorage.getItem("token");
+  const response = await fetch("http://127.0.0.1:8000/protected", {
+      headers: { "Authorization": `Bearer ${token}` }
+  });
+
+  const resultado = await response.json();
+  document.getElementById("resultado").innerText = JSON.stringify(resultado);
+}

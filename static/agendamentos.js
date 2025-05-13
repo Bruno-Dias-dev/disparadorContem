@@ -18,6 +18,15 @@ document.addEventListener("DOMContentLoaded", async function () {
         const card = document.createElement("div");
         card.className = "col-md-4 mb-3";
 
+        const horarioDisparo = new Date(agendamento.horario_disparo);
+        const agora = new Date();
+        const statusBadge =
+          horarioDisparo < agora
+            ? `<span class="badge bg-success">Enviados</span>`
+            : `<span class="badge bg-warning text-dark">Agendado</span>`;
+        console.log(
+          `Agendamento: ${agendamento.nome}, Status: ${statusBadge}`
+        );
         card.innerHTML = `
                     <div class="card mb-3" style="border-color:orange">
                         <div class="card-body">
@@ -26,7 +35,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                             } </h5>                            
                             <p class="text-muted">Disparo em: ${formatarData(
                               agendamento.horario_disparo
-                            )}</p>
+                            )} - ${statusBadge}</p>
+                             
                           <button class="btn btn-danger btn-sm btn-excluir" data-id="${
                             agendamento.id
                           }">
@@ -45,33 +55,33 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   window.deletarAgendamento = function (id) {
     Swal.fire({
-      title: 'Você tem certeza?',
-      text: 'Deseja excluir este agendamento?',
-      icon: 'warning',
+      title: "Você tem certeza?",
+      text: "Deseja excluir este agendamento?",
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonText: 'Sim, excluir',
-      cancelButtonText: 'Cancelar',
+      confirmButtonText: "Sim, excluir",
+      cancelButtonText: "Cancelar",
       customClass: {
-        confirmButton: 'btn bg-prim', 
-        cancelButton: 'btn btn-secondary' 
+        confirmButton: "btn bg-prim",
+        cancelButton: "btn btn-secondary",
       },
-      buttonsStyling: false
+      buttonsStyling: false,
     }).then((result) => {
       if (result.isConfirmed) {
-        excluirAgendamento(id); 
+        excluirAgendamento(id);
       }
     });
   };
-  
+
   async function excluirAgendamento(id) {
     try {
       const response = await fetch(`${API_URL}/api/agendamento/${id}`, {
         method: "DELETE",
-        credentials: "include", 
+        credentials: "include",
       });
-  
+
       const result = await response.json();
-  
+
       await Swal.fire({
         icon: "success",
         title: "Sucesso!",
@@ -82,9 +92,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         },
         buttonsStyling: false,
       });
-  
+
       window.location.href = "/agendamentos/";
-  
     } catch (error) {
       await Swal.fire({
         icon: "error",
@@ -96,11 +105,10 @@ document.addEventListener("DOMContentLoaded", async function () {
         },
         buttonsStyling: false,
       });
-  
+
       window.location.href = "/agendamentos/";
     }
   }
-  
 
   listaAgendamentos.addEventListener("click", function (event) {
     if (event.target.closest(".btn-excluir")) {

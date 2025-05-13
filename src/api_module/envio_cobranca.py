@@ -2,6 +2,7 @@ import pandas as pd
 import csv
 import time
 from src.api_module.mensagens import *
+from datetime import datetime
 
 def processar_xlsx(arquivo_xlsx):
     df = pd.read_excel(arquivo_xlsx)
@@ -28,6 +29,13 @@ def processar_xlsx(arquivo_xlsx):
         writer = csv.writer(file)
         writer.writerow(['Código da Fatura', 'Número', 'Status', 'Erro'])
         writer.writerows(resultados)
+        
+def envio_log(data_msg):
+    numero = formtatar_numero(data_msg['celular'])
+    data_msg['number'] = numero
+
+    post_mensagem_sem_cadastro(data_msg)
+
 
 def envio_via_banco(data_msg, fatura, pdf):
     resultados = []
@@ -50,7 +58,10 @@ def envio_via_banco(data_msg, fatura, pdf):
         resultados.append([fatura['codigo_da_fatura'], numero, 'Falha', str(e)])
     
     # Escrever os resultados no arquivo CSV
-    with open('resultados_envio_automacao.csv', mode='w', newline='') as file:
+    data_hoje = datetime.now().strftime('%Y-%m-%d')  
+    nome_arquivo = f'{data_hoje}_resultados_envio_automacao.csv'
+    
+    with open(nome_arquivo, mode='w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(['Código da Fatura', 'Número', 'Status', 'Erro'])
         writer.writerows(resultados)

@@ -62,3 +62,17 @@ CREATE TABLE usuarios(
 );
 
 alter table grupo_mensagens add column fase varchar(20);
+CREATE TABLE logs_envio (
+    id SERIAL PRIMARY KEY,
+    
+    agendamento_id INTEGER NOT NULL,
+    FOREIGN KEY (agendamento_id) REFERENCES agendamentos(id),
+    
+    inicio_envio TIMESTAMP NOT NULL,
+    final_envio TIMESTAMP,
+
+    qtd_enviados INTEGER DEFAULT 0,
+    qtd_falha INTEGER DEFAULT 0
+);
+
+

@@ -22,6 +22,18 @@ def get_db():
     db.connect()
     return db
 
+def registrar_log_envio(agendamento_id, inicio_envio, final_envio, qtd_enviados, qtd_falha):
+    db = PostgresConnection(**DB_CONFIG)
+    db.connect()
+    try:
+        db.insert_table(table="logs_envio", columns=("agendamento_id", "inicio_envio", "final_envio", "qtd_enviados", "qtd_falha"), values=(agendamento_id, inicio_envio, final_envio, qtd_enviados, qtd_falha))
+        return { "message": "Log de envio registrado com sucesso"}
+    except Exception as e:
+        print("❌ Erro ao registrar log de envio:", e)
+        return {"error": str(e)}
+    finally:
+        db.close()
+   
 def criar_agendamento(grupo_id, horario_disparo, ativo, conexao_id, departamento_id, mensagem_ids=None,):
     """Cria um novo agendamento de mensagem"""
     db = PostgresConnection(**DB_CONFIG)

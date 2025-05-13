@@ -75,7 +75,7 @@ $(document).ready(async function () {
       });
       
       const result = await response.json();
-      Swal.fire({
+      await Swal.fire({
         icon: "success",
         title: "Sucesso!",
         text: result.message || "Agendamento salvo com sucesso!",
@@ -89,7 +89,7 @@ $(document).ready(async function () {
       });
       if (!result.error) window.location.href = "/agendamentos/";
     } catch (error) {
-      Swal.fire({
+      await Swal.fire({
         icon: "error",
         title: "Erro!", 
         text: error.message || "Erro ao salvar o agendamento.",

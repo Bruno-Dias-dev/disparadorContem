@@ -8,3 +8,4 @@ class GrupoMensagensModel(BaseModel):
     alertas_contratos: dict = None
     ativo: bool = True
     pdf: bool = False
+    fase: str = None

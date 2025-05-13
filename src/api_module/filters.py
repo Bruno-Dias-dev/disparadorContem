@@ -17,9 +17,8 @@ DB_CONFIG = {
 
 def list_contratos(db):
     try:
-        query = 'select distinct "convênio" from relatorio_contratos order by "convênio"'
+        query = 'select distinct "convenio" from relatorio_contratos order by "convenio"'
         result = db.execute_query(query)
-        print("🔎 Listando convênios...")
         # for row in db.fetchall():
         return result
 

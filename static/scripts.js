@@ -17,13 +17,18 @@ $(document).ready(async function () {
     try {
       const response = await fetch(API_URL + endpoint);
       if (!response.ok) throw new Error(`Erro ao carregar ${selectId}`);
-      
+
       const data = await response.json();
       const select = $(`#${selectId}`);
       select.empty();
 
+      if (endpoint == "/convenios") {
+        select.append(new Option("Todos", "Todos"));
+      }
       data.forEach((item) => {
-        select.append(new Option(Object.values(item)[0], Object.values(item)[0]));
+        select.append(
+          new Option(Object.values(item)[0], Object.values(item)[0])
+        );
       });
 
       select.trigger("change");
@@ -48,7 +53,16 @@ $(document).ready(async function () {
     const pdf = $("#pdf").is(":checked");
 
     if (!nome) {
-      alert("O nome do grupo é obrigatório!");
+      await Swal.fire({
+        icon: "warning",
+        title: "Atenção!",
+        text: result.message || "O nome do grupo é obrigatório!",
+        confirmButtonText: "OK",
+        customClass: {
+          confirmButton: "btn bg-prim",
+        },
+        buttonsStyling: false,
+      });
       return;
     }
 
@@ -60,6 +74,7 @@ $(document).ready(async function () {
       alertas_contratos: getSelectedJson("alertasContratos"),
       ativo,
       pdf,
+      fase: $("#qtdeDiasAtraso").val(),
     };
 
     try {
@@ -74,12 +89,28 @@ $(document).ready(async function () {
       if (!response.ok) {
         throw new Error(result.error || "Erro ao salvar o grupo.");
       }
-
-      alert("Grupo cadastrado com sucesso!");
+      await Swal.fire({
+        icon: "success",
+        title: "Sucesso!",
+        text: result.message || "Grupo cadastrado com sucesso!",
+        confirmButtonText: "OK",
+        customClass: {
+          confirmButton: "btn bg-prim",
+        },
+        buttonsStyling: false,
+      });
       window.location.href = "/"; // Redireciona após o cadastro
     } catch (error) {
-      console.error("Erro:", error);
-      alert(`Erro ao salvar o grupo: ${error.message}`);
+        await Swal.fire({
+        icon: "error",
+        title: "Erro!",
+        text: result.message || `Erro ao salvar o grupo: ${error.message}`,
+        confirmButtonText: "OK",
+        customClass: {
+          confirmButton: "btn bg-prim",
+        },
+        buttonsStyling: false,
+      });
     }
   }
 
@@ -90,4 +121,18 @@ $(document).ready(async function () {
 
   $("#salvarGrupoBtn").on("click", salvarGrupo);
   $("#limparCamposBtn").on("click", limparCampos);
+
+  $("#statusContratos").on("change", function () {
+    const statusSelecionado = $(this).val();
+    console.log("Status selecionado:", statusSelecionado);
+
+    if (statusSelecionado.includes("Cancelado")) {
+      $("#qtdeDiasAtraso").closest(".mb-3").removeClass("d-none");
+
+      // preencherSelect(endpoints.alertasContratos, "qtdeDiasAtraso");
+    } else {
+      // Oculta o select de Dias Em Atraso
+      $("#qtdeDiasAtraso").closest(".mb-3").addClass("d-none");
+    }
+  });
 });

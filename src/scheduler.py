@@ -16,6 +16,9 @@ def disparar_mensagens():
     # print(f"🔔 Verificando agendamentos para {agora}...")
 
     agendamentos = listar_agendamentos()
+    if not agendamentos:
+        print("🔔 Nenhum agendamento encontrado.")
+        return
     for agendamento in agendamentos:
         horario_agendado = agendamento["horario_disparo"].strftime("%d/%m/%Y %H:%M")
         print(f"🕒 Agendamento: {horario_agendado} | Agora: {agora}")
@@ -35,7 +38,7 @@ def disparar_mensagens():
                     "departmentId": str(agendamento["departamento_id"])
                 }                  
                 envio_via_banco(data_msg,fatura,envia_pdf)
-                intervalo = random.uniform(6, 15)
+                intervalo = random.uniform(7, 30)
                 print(f"⏳ Aguardando {intervalo:.2f} segundos antes do próximo envio...")
                 time.sleep(intervalo)  
                     

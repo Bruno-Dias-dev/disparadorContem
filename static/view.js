@@ -11,13 +11,15 @@ $(document).ready(function () {
     ajax: {
       url: `http://127.0.0.1:8000/grupos/${grupoId}/faturas`,
       dataSrc: function (json) {
+        console.log(json);
         return json.map((item) => ({
-          codigo: item["código_da_fatura"],
+          codigo: item["codigo_da_fatura"], 
           celular: item.celular,
+          dias_em_atraso: item.qtde_dias_atraso,          
         }));
       },
     },
-    columns: [{ data: "codigo" }, { data: "celular" }],
+    columns: [{ data: "codigo" }, { data: "celular" }, { data: "dias_em_atraso" }],
     language: {
       url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json"
     },

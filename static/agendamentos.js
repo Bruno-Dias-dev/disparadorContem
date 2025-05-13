@@ -27,7 +27,9 @@ document.addEventListener("DOMContentLoaded", async function () {
                             <p class="text-muted">Disparo em: ${formatarData(
                               agendamento.horario_disparo
                             )}</p>
-                          <button class="btn btn-danger btn-sm btn-excluir" data-id="${agendamento.id}">
+                          <button class="btn btn-danger btn-sm btn-excluir" data-id="${
+                            agendamento.id
+                          }">
                             <i class="bi bi-trash"></i> 
                           </button>
                         </div>
@@ -41,22 +43,64 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   }
 
-  window.deletarAgendamento = async function (id) {
-    if (!confirm("Tem certeza que deseja excluir este agendamento?")) return;
-
-    try {
-      const response = await fetch(`${API_URL}/agendamento/${id}`, {
-        method: "DELETE",
-      });
-
-      const result = await response.json();
-      alert(result.message || result.error);
-
-      if (!result.error) carregarAgendamentos();
-    } catch (error) {
-      console.error("Erro ao excluir grupo:", error);
-    }
+  window.deletarAgendamento = function (id) {
+    Swal.fire({
+      title: 'Você tem certeza?',
+      text: 'Deseja excluir este agendamento?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sim, excluir',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        confirmButton: 'btn bg-prim', 
+        cancelButton: 'btn btn-secondary' 
+      },
+      buttonsStyling: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        excluirAgendamento(id); 
+      }
+    });
   };
+  
+  async function excluirAgendamento(id) {
+    try {
+      const response = await fetch(`${API_URL}/api/agendamento/${id}`, {
+        method: "DELETE",
+        credentials: "include", 
+      });
+  
+      const result = await response.json();
+  
+      await Swal.fire({
+        icon: "success",
+        title: "Sucesso!",
+        text: result.message || "Agendamento excluído com sucesso.",
+        confirmButtonText: "OK",
+        customClass: {
+          confirmButton: "btn bg-prim",
+        },
+        buttonsStyling: false,
+      });
+  
+      window.location.href = "/agendamentos/";
+  
+    } catch (error) {
+      await Swal.fire({
+        icon: "error",
+        title: "Erro!",
+        text: "Erro ao excluir o agendamento.",
+        confirmButtonText: "OK",
+        customClass: {
+          confirmButton: "btn bg-prim",
+        },
+        buttonsStyling: false,
+      });
+  
+      window.location.href = "/agendamentos/";
+    }
+  }
+  
 
   listaAgendamentos.addEventListener("click", function (event) {
     if (event.target.closest(".btn-excluir")) {

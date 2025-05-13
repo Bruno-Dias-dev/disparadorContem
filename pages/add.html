@@ -13,7 +13,8 @@
 
     <!-- Bootstrap CDN -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <link
       href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
       rel="stylesheet"
@@ -77,6 +78,21 @@
             ></select>
           </div>
 
+          <div class="mb-3 d-none">
+            <label for="qtdeDiasAtraso" class="form-label"
+              >Dias Em Atraso:</label
+            >
+            <select id="qtdeDiasAtraso" class="form-select select2">
+              <option value="0">Selecione uma fase</option>
+              <option value="1-30">FASE 1</option>
+              <option value="31-90">FASE 2</option>
+              <option value="91-180">FASE 3</option>
+              <option value="181-360">FASE 4</option>
+              <option value="361-720">FASE 5</option>
+              <option value="721-1440">FASE 4</option>
+            </select>
+          </div>
+
           <div class="mb-3">
             <label for="alertasContratos" class="form-label"
               >Alertas de Contratos:</label
@@ -134,6 +150,6 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/static/scripts.js"></script>
+    <script src="/static/scripts.js"></script>    
   </body>
 </html>

@@ -5,7 +5,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     width: "100%",
   });
 
-  const API_URL = "http://127.0.0.1:8000";
+  const API_URL = window.api_url;
+  console.log("URL da API:", API_URL);
+
+  // const API_URL = "http://127.0.0.1:8000";
   const pathSegments = window.location.pathname.split("/");
   const grupoId = pathSegments[pathSegments.length - 1];
 
@@ -72,17 +75,26 @@ document.addEventListener("DOMContentLoaded", async function () {
       // Buscar todas as opções da API
       const response = await fetch(`http://127.0.0.1:8000${endpoint}`);
       const allOptions = await response.json();
-    
-      // Adiciona todas as opções ao select
+
+      if (endpoint === "/convenios") {
+        const todosOption = document.createElement("option");
+        todosOption.value = "Todos";
+        todosOption.textContent = "Todos";
+        if (selectedValues.includes("Todos")) {
+          todosOption.selected = true;
+        }
+        select.appendChild(todosOption);
+      }
+
       allOptions.forEach((item) => {
         const value = Object.values(item)[0]; // Pega o valor do JSON retornado
         const option = document.createElement("option");
         option.value = value;
         option.textContent = value;
 
-        // Se o valor já estava selecionado, marcar como `selected`
         if (selectedValues.includes(value)) {
           option.selected = true;
+          console.log(`Valor ${value} já estava selecionado.`);
         }
 
         select.appendChild(option);
@@ -111,7 +123,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       // Captura múltiplos valores selecionados e converte em um objeto JSON válido
       function getSelectedJson(selectId) {
         const values = $(`#${selectId}`).val() || [];
-        return { valores: values }; 
+        return { valores: values };
       }
 
       const convenios = getSelectedJson("convenios");

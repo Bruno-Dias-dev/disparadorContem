@@ -27,7 +27,6 @@ def list_tb(table: str = "faturas",page: int = 1, page_size: int = 100):
         result = db.execute_query(query)
         return result
     except Exception as e:
-        print(f"❌ Erro ao capturar dados: {e}")
         return {"error": str(e)}
     finally:
         db.close()        
@@ -41,7 +40,6 @@ def list_tb_contratos(page: int = 1, page_size: int = 100):
         result = db.execute_query(query)
         return result
     except Exception as e:
-        print(f"❌ Erro ao capturar dados: {e}")
         return {"error": str(e)}
     finally:
         db.close()
@@ -54,7 +52,6 @@ def list_tb_faturas():
         result = db.execute_query(query)
         return result  # Retorna a lista de convênios
     except Exception as e:
-        print(f"❌ Erro ao capturar dados: {e}")
         return {"error": str(e)}
     finally:
         db.close()
@@ -64,11 +61,10 @@ def list_convenios():
     db = get_db()
     
     try:
-        query = 'SELECT DISTINCT "convênio" FROM relatorio_contratos ORDER BY "convênio"'
+        query = 'SELECT DISTINCT "convenio" FROM relatorio_contratos ORDER BY "convenio"'
         result = db.execute_query(query)
         return result  # Retorna a lista de convênios
     except Exception as e:
-        print(f"❌ Erro ao capturar dados: {e}")
         return {"error": str(e)}
     finally:
         db.close()
@@ -82,7 +78,6 @@ def list_estipulantes():
         result = db.execute_query(query)
         return result  
     except Exception as e:
-        print(f"❌ Erro ao capturar dados: {e}")
         return {"error": str(e)}
     finally:
         db.close()
@@ -96,7 +91,6 @@ def list_status_contrato():
         result = db.execute_query(query)
         return result  
     except Exception as e:
-        print(f"❌ Erro ao capturar dados: {e}")
         return {"error": str(e)}
     finally:
         db.close()
@@ -108,21 +102,19 @@ def list_alerta_contrato():
     try:
         query = 'SELECT DISTINCT "alerta" FROM relatorio_contratos ORDER BY "alerta"'
         result = db.execute_query(query)
-        print(result)
         return result  
     except Exception as e:
-        print(f"❌ Erro ao capturar dados: {e}")
         return {"error": str(e)}
     finally:
         db.close()
 
-def create_grupo_mensagens(nome, convenios, estipulantes, status_contratos, alertas_contratos, ativo, pdf):
+def create_grupo_mensagens(nome, convenios, estipulantes, status_contratos, alertas_contratos, ativo, pdf, fase):
     """Cria um novo grupo de mensagens no banco de dados."""
     db = get_db()
 
     try:
         table = "grupo_mensagens"
-        columns = ["nome", "convenios", "estipulantes", "status_contratos", "alertas_contratos", "ativo", "pdf"]
+        columns = ["nome", "convenios", "estipulantes", "status_contratos", "alertas_contratos", "ativo", "pdf", "fase"]
         values = [
             nome,
             json.dumps(convenios) if convenios else None,  # Converte para JSON
@@ -130,14 +122,14 @@ def create_grupo_mensagens(nome, convenios, estipulantes, status_contratos, aler
             json.dumps(status_contratos) if status_contratos else None,
             json.dumps(alertas_contratos) if alertas_contratos else None,
             ativo,
-            pdf
+            pdf,
+            fase
         ]
 
         db.insert_table(table=table, columns=columns, values=values)
         return {"message": "Grupo criado com sucesso!"}
 
     except Exception as e:
-        print(f"❌ Erro ao inserir grupo de mensagens: {e}")
         return {"error": str(e)}
 
     finally:
@@ -223,12 +215,17 @@ def get_faturas_por_grupo(grupo_id: int):
     
     try:
         query = """
-    SELECT rf.código_da_fatura,celular
-    FROM relatorio_faturas rf
+    SELECT 
+        rf.codigo_da_fatura,
+        celular,
+        qtde_dias_atraso
+    FROM 
+        relatorio_faturas rf
     JOIN grupo_mensagens gm 
         ON (
             gm.convenios IS NULL 
-            OR rf.convênio_do_fatura = ANY (
+            OR gm.convenios->'valores' @> '["Todos"]'::jsonb
+            OR rf.convenio_do_fatura = ANY (
                 SELECT jsonb_array_elements_text(gm.convenios->'valores')
             )
         )
@@ -251,7 +248,17 @@ def get_faturas_por_grupo(grupo_id: int):
                 SELECT jsonb_array_elements_text(gm.alertas_contratos->'valores')
             )
         )
-    WHERE gm.id = %s;
+        AND (
+            gm.fase IS NULL
+            OR gm.fase = '0'
+            OR (
+                qtde_dias_atraso::INTEGER BETWEEN 
+                SPLIT_PART(gm.fase, '-', 1)::int AND 
+                SPLIT_PART(gm.fase, '-', 2)::int
+            )
+        )
+    WHERE 
+        gm.id = %s;
     """
         result = db.execute_query(query, (grupo_id,))    
         return result
@@ -289,7 +296,6 @@ def create_mensagem(mensagem, ativo, titulo):
         return {"message": "Mensagem criada com sucesso!"}
 
     except Exception as e:
-        print(f"❌ Erro ao inserir mensagem: {e}")
         return {"error": str(e)}
 
     finally:

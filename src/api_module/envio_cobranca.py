@@ -19,7 +19,6 @@ def processar_xlsx(arquivo_xlsx):
             resultados.append([row['Código da Fatura'], numero, 'Sucesso', ''])
         except Exception as e:
             resultado = f"Falha ao enviar mensagem para {numero} com código da fatura {str(row['Código da Fatura'])}: {e}"
-            print(resultado)
             resultados.append([row['Código da Fatura'], numero, 'Falha', str(e)])
         
         time.sleep(1)
@@ -33,25 +32,22 @@ def processar_xlsx(arquivo_xlsx):
 def envio_via_banco(data_msg, fatura, pdf):
     resultados = []
 
-    url_pdf = 'https://digitalsaude.com.br/financeiro/fatura/ImprimirFatura?codigo=' + str(fatura['código_da_fatura']) 
+    url_pdf = 'https://digitalsaude.com.br/financeiro/fatura/ImprimirFatura?codigo=' + str(fatura['codigo_da_fatura']) 
     numero = formtatar_numero(fatura['celular'])
     data_msg['url_pdf'] = url_pdf
     data_msg['number'] = numero
     try:
         if pdf: 
             enviar_mensagem_com_pdf(data_msg)
-            resultado = f"Mensagem enviada, com PDF, para {numero} com código da fatura {str(fatura['código_da_fatura'])}"
-            print(resultado)
-            resultados.append([fatura['código_da_fatura'], numero, 'Sucesso', ''])
+            resultado = f"Mensagem enviada, com PDF, para {numero} com código da fatura {str(fatura['codigo_da_fatura'])}"
+            resultados.append([fatura['codigo_da_fatura'], numero, 'Sucesso', ''])
         else:    
             post_mensagem_sem_cadastro(data_msg)
-            resultado = f"Mensagem enviada para {numero} com código da fatura {str(fatura['código_da_fatura'])}"
-            print(resultado)
-            resultados.append([fatura['código_da_fatura'], numero, 'Sucesso', ''])
+            resultado = f"Mensagem enviada para {numero} com código da fatura {str(fatura['codigo_da_fatura'])}"
+            resultados.append([fatura['codigo_da_fatura'], numero, 'Sucesso', ''])
     except Exception as e:
-        resultado = f"Falha ao enviar mensagem para {numero} com código da fatura {str(fatura['código_da_fatura'])}: {e}"
-        print(resultado)
-        resultados.append([fatura['código_da_fatura'], numero, 'Falha', str(e)])
+        resultado = f"Falha ao enviar mensagem para {numero} com código da fatura {str(fatura['codigo_da_fatura'])}: {e}"
+        resultados.append([fatura['codigo_da_fatura'], numero, 'Falha', str(e)])
     
     # Escrever os resultados no arquivo CSV
     with open('resultados_envio_automacao.csv', mode='w', newline='') as file:

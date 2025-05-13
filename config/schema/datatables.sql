@@ -61,3 +61,4 @@ CREATE TABLE usuarios(
     modified timestamp
 );
 
+alter table grupo_mensagens add column fase varchar(20);

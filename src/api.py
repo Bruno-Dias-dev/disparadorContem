@@ -3,6 +3,8 @@ from fastapi import FastAPI
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from fastapi.responses import Response
+from config.settings import settings
 from pathlib import Path
 from src.routers.mensagens import router as mensagens_router  # Importando corretamente
 from src.scheduler import iniciar_scheduler
@@ -13,7 +15,6 @@ from src.routers.usuario_route import router as usuario_route
 
 import os
 from dotenv import load_dotenv
-
 
 load_dotenv()
 
@@ -51,7 +52,13 @@ app.include_router(mensagens_router)
 app.include_router(agendamento_router)
 app.include_router(usuario_route)
 
-# Servir páginas HTML
+@app.get("/config.js")
+def get_config_js():
+    return {"api_url": settings.api_url}
+    # js = f'window.API_URL = "{settings.API_URL}";'
+    # print(js)
+    # return Response(content=js, media_type="application/javascript")
+
 @app.get("/login")
 async def serve_login():
     return FileResponse("pages/login.html")

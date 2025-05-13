@@ -40,7 +40,6 @@ def cadastrar_usuario(usuario: UsuarioModel, tags=["Usuário"]):
         return {"mensagem": "Usuário cadastrado com sucesso!"}
     
     except Exception as e:
-        print(f"Erro ao cadastrar dados: {e}")
         return {"error": str(e)}
     finally:
         db.close()

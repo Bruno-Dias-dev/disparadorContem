@@ -15,5 +15,3 @@ def get_contatos(page=1, qtd=50):
     request = requests.get(url, headers=headers, params=params)
     return request.json()
 
-print(get_contatos(2,1))
-exit()

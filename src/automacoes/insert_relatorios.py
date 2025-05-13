@@ -26,8 +26,8 @@ DB_CONFIG = {
     "host": "localhost",
     "database": "contem",
     "user": "postgres",
-    # "password": "C@med2024",
-    "password": "051295",
+    "password": "C@med2024",
+    # "password": "051295",
     "port": 5432
 }
 
@@ -123,8 +123,8 @@ def main(local_file, table_name):
     db = PostgresConnection(**DB_CONFIG)
 
     # Caminho absoluto do arquivo Excel
-    # excel_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../docs/contratos.xlsx"))
     # excel_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../docs/faturas.xlsx"))
+    # excel_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../docs/contratos.xlsx"))
     # excel_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../docs/inadimplencia.xlsx"))
     excel_file = os.path.abspath(os.path.join(os.path.dirname(__file__), local_file))
     print("📂 Caminho do arquivo Excel:", excel_file)
@@ -133,12 +133,14 @@ def main(local_file, table_name):
     # import_excel_to_postgres(excel_file, "Planilha", db, "relatorio_faturas")
     # import_excel_to_postgres(excel_file, "Planilha", db, "relatorio_contratos")
     # import_excel_to_postgres(excel_file, "Planilha", db, "relatorio_inadimplencia")
-    import_excel_to_postgres(excel_file, "Planilha", db, table_name)
+    import_excel_to_postgres(excel_file, "Planilha", db, table_name) 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Importa relatórios para o banco de dados")
-    parser.add_argument("local_file", help="Caminho do arquivo Excel")
-    parser.add_argument("table_name", help="Nome da tabela no banco de dados")
+    # parser = argparse.ArgumentParser(description="Importa relatórios para o banco de dados")
+    # parser.add_argument("local_file", help="Caminho do arquivo Excel")
+    # parser.add_argument("table_name", help="Nome da tabela no banco de dados")
 
-    args = parser.parse_args()
-    main(args.local_file, args.table_name)
+    # args = parser.parse_args()
+    # main(args.local_file, args.table_name)
+    main("../../docs/Fatura_.xlsx", "relatorio_faturas")
+

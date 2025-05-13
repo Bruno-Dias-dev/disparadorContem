@@ -15,6 +15,10 @@ textarea {
     color: white;
 }
 
+.bg-prim:hover{
+    background-color: #ed1c24;
+    color: white;
+}
 .divider:after,
 .divider:before {
 content: "";

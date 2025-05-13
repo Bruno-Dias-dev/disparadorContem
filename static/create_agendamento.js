@@ -75,10 +75,32 @@ $(document).ready(async function () {
       });
       
       const result = await response.json();
-      alert(result.message || result.error);
+      Swal.fire({
+        icon: "success",
+        title: "Sucesso!",
+        text: result.message || "Agendamento salvo com sucesso!",
+        confirmButtonText: "OK",
+        customClass: {
+          confirmButton: "btn bg-prim",
+        },
+        buttonsStyling: true,
+      }).then(() => {
+        window.location.href = "/agendamentos/";
+      });
       if (!result.error) window.location.href = "/agendamentos/";
     } catch (error) {
-      console.error("Erro:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Erro!", 
+        text: error.message || "Erro ao salvar o agendamento.",
+        confirmButtonText: "OK",
+        customClass: {
+          confirmButton: "btn bg-prim",
+        },
+        buttonsStyling: true,
+      }).then(() => {
+        window.location.href = "/agendamentos/";
+      });
     }
 
     function limparCampos() {

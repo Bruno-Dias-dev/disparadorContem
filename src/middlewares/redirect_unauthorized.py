@@ -11,7 +11,7 @@ class RedirectUnauthorizedMiddleware(BaseHTTPMiddleware):
             or path.startswith("/login") 
             or path.startswith("/api")
             or path.startswith("/docs")
-            or path.startswith("/cadastrar")
+            or path.startswith("/usuarios/cadastrar")
         ):
             return await call_next(request) 
         

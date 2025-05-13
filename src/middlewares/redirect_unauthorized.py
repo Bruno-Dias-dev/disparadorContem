@@ -6,7 +6,13 @@ class RedirectUnauthorizedMiddleware(BaseHTTPMiddleware):
         path = request.url.path
         
         # Rotas livres
-        if path.startswith("/static/") or path.startswith("/login") or path.startswith("/api"):
+        if (
+            path.startswith("/static/") 
+            or path.startswith("/login") 
+            or path.startswith("/api")
+            or path.startswith("/docs")
+            or path.startswith("/cadastrar")
+        ):
             return await call_next(request) 
         
         # Se não tiver sessão de usuário

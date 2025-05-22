@@ -258,7 +258,9 @@ def get_faturas_por_grupo(grupo_id: int):
             )
         )
     WHERE 
-        gm.id = %s;
+        gm.id = %s
+        AND
+        DATE(rf.updated_at) = CURRENT_DATE;
     """
         result = db.execute_query(query, (grupo_id,))    
         return result

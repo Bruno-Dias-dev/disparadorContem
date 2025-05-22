@@ -14,7 +14,7 @@
     <!-- Bootstrap CDN -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+
     <link
       href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
       rel="stylesheet"
@@ -47,92 +47,112 @@
             <label for="nome" class="form-label">Nome do Grupo:</label>
             <input type="text" id="nome" class="form-control" required />
           </div>
-
           <div class="mb-3">
-            <label for="convenios" class="form-label">Convênios:</label>
+            <label for="nome" class="form-label">Tipo de Grupo:</label>
+
             <select
-              id="convenios"
-              size="1"
-              class="form-select select2"
-              multiple
-            ></select>
-          </div>
-
-          <div class="mb-3">
-            <label for="estipulantes" class="form-label">Estipulantes:</label>
-            <select
-              id="estipulantes"
-              class="form-select select2"
-              multiple
-            ></select>
-          </div>
-
-          <div class="mb-3">
-            <label for="statusContratos" class="form-label"
-              >Status dos Contratos:</label
+              name="selectUpload"
+              id="selectUpload"
+              class="form-control"
+              onchange="alternarDivs()"
             >
-            <select
-              id="statusContratos"
-              class="form-select select2"
-              multiple
-            ></select>
-          </div>
-
-          <div class="mb-3 d-none">
-            <label for="qtdeDiasAtraso" class="form-label"
-              >Dias Em Atraso:</label
-            >
-            <select id="qtdeDiasAtraso" class="form-select select2">
-              <option value="0">Selecione uma fase</option>
-              <option value="1-30">FASE 1</option>
-              <option value="31-90">FASE 2</option>
-              <option value="91-180">FASE 3</option>
-              <option value="181-360">FASE 4</option>
-              <option value="361-720">FASE 5</option>
-              <option value="721-1440">FASE 4</option>
+              <option value="0">Selecione uma opção</option>
+              <option value="1">Upload de Arquivo</option>
+              <option value="2">Automação de Relatório</option>
             </select>
           </div>
-
-          <div class="mb-3">
-            <label for="alertasContratos" class="form-label"
-              >Alertas de Contratos:</label
-            >
-            <select
-              id="alertasContratos"
-              class="form-select select2"
-              multiple
-            ></select>
-          </div>
-
-          <div class="mb-3">
-            <div class="form-check form-switch">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                role="switch"
-                id="ativo"
-                checked
-              />
-              <label class="form-check-label" for="ativo" class="form-label"
-                >Grupo Ativo?</label
-              >
+          <div id="uploadArquivo" class="d-none">
+            <div class="mb-3">
+              <label for="arquivo" class="form-label">Arquivo:</label>
+              <input type="file" id="arquivo" class="form-control" accept=".xlsx" />
             </div>
           </div>
+          <div id="relatorioAutomacao" class="d-none">
+            <div class="mb-3">
+              <label for="convenios" class="form-label">Convênios:</label>
+              <select
+                id="convenios"
+                size="1"
+                class="form-select select2"
+                multiple
+              ></select>
+            </div>
 
-          <div class="mb-3">
-            <div class="form-check form-switch">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                role="switch"
-                id="pdf"
-              />
-              <label class="form-check-label" for="pdf" class="form-label"
-                >Envio de PDF?</label
+            <div class="mb-3">
+              <label for="estipulantes" class="form-label">Estipulantes:</label>
+              <select
+                id="estipulantes"
+                class="form-select select2"
+                multiple
+              ></select>
+            </div>
+
+            <div class="mb-3">
+              <label for="statusContratos" class="form-label"
+                >Status dos Contratos:</label
               >
+              <select
+                id="statusContratos"
+                class="form-select select2"
+                multiple
+              ></select>
+            </div>
+
+            <div class="mb-3 d-none">
+              <label for="qtdeDiasAtraso" class="form-label"
+                >Dias Em Atraso:</label
+              >
+              <select id="qtdeDiasAtraso" class="form-select select2">
+                <option value="0">Selecione uma fase</option>
+                <option value="1-30">FASE 1</option>
+                <option value="31-90">FASE 2</option>
+                <option value="91-180">FASE 3</option>
+                <option value="181-360">FASE 4</option>
+                <option value="361-720">FASE 5</option>
+                <option value="721-1440">FASE 4</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="alertasContratos" class="form-label"
+                >Alertas de Contratos:</label
+              >
+              <select
+                id="alertasContratos"
+                class="form-select select2"
+                multiple
+              ></select>
+            </div>
+
+            <div class="mb-3">
+              <div class="form-check form-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  role="switch"
+                  id="ativo"
+                  checked
+                />
+                <label class="form-check-label" for="ativo" class="form-label"
+                  >Grupo Ativo?</label
+                >
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <div class="form-check form-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  role="switch"
+                  id="pdf"
+                />
+                <label class="form-check-label" for="pdf" class="form-label"
+                  >Envio de PDF?</label
+                >
+              </div>
             </div>
           </div>
-
           <button type="button" class="btn btn-secondary" id="limparCamposBtn">
             Limpar
           </button>
@@ -150,6 +170,28 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/static/scripts.js"></script>    
+    <script src="/static/scripts.js"></script>
   </body>
 </html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+  function alternarDivs() {
+    const valorSelecionado = document.getElementById("selectUpload").value;
+
+    const divUpload = document.getElementById("uploadArquivo");
+    const divOutra = document.getElementById("relatorioAutomacao");
+
+    if (valorSelecionado === "1") {
+      divUpload.classList.remove("d-none");
+      divOutra.classList.add("d-none");
+    } else if (valorSelecionado === "2") {
+      divUpload.classList.add("d-none");
+      divOutra.classList.remove("d-none");
+    } else {
+      // Se for "0" ou outra coisa, esconde os dois
+      divUpload.classList.add("d-none");
+      divOutra.classList.add("d-none");
+    }
+  }
+</script>

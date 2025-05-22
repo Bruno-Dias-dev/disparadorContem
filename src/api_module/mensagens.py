@@ -59,7 +59,9 @@ def post_mensagem_sem_cadastro(data: Dict[str, str]) -> Dict[str, Any]:
     payload = {
         "text": data['text'],
         "type": "chat",
-        "serviceId": data['service_id'],
+        "serviceId": data['serviceId'],
+        "departmentId": data['departmentId'],
+        "dontOpenTicket": "true",
         "number": data['number'],
         "origin": "user" # ou "bot"
     }

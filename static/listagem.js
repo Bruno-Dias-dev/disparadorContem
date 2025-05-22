@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       const tabela = $("#tbGrupos").DataTable({
         language: {
           url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json",
-        }
+        },
       });
       tabela.clear();
 
@@ -67,4 +67,5 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   carregarGrupos();
 });
+
 

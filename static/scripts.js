@@ -51,12 +51,13 @@ $(document).ready(async function () {
     const nome = $("#nome").val().trim();
     const ativo = $("#ativo").is(":checked");
     const pdf = $("#pdf").is(":checked");
+    const tipoGrupo = $("#selectUpload").val();
 
     if (!nome) {
       await Swal.fire({
         icon: "warning",
         title: "Atenção!",
-        text: result.message || "O nome do grupo é obrigatório!",
+        text: "O nome do grupo é obrigatório!",
         confirmButtonText: "OK",
         customClass: {
           confirmButton: "btn bg-prim",
@@ -66,51 +67,56 @@ $(document).ready(async function () {
       return;
     }
 
-    const grupoData = {
-      nome,
-      convenios: getSelectedJson("convenios"),
-      estipulantes: getSelectedJson("estipulantes"),
-      status_contratos: getSelectedJson("statusContratos"),
-      alertas_contratos: getSelectedJson("alertasContratos"),
-      ativo,
-      pdf,
-      fase: $("#qtdeDiasAtraso").val(),
-    };
+    if (tipoGrupo === "1") {
+      validarEEnviarArquivo();
+      return;
+    } else {
+      const grupoData = {
+        nome,
+        convenios: getSelectedJson("convenios"),
+        estipulantes: getSelectedJson("estipulantes"),
+        status_contratos: getSelectedJson("statusContratos"),
+        alertas_contratos: getSelectedJson("alertasContratos"),
+        ativo,
+        pdf,
+        fase: $("#qtdeDiasAtraso").val(),
+      };
 
-    try {
-      const response = await fetch(`${API_URL}/grupos`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(grupoData),
-      });
+      try {
+        const response = await fetch(`${API_URL}/grupos`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(grupoData),
+        });
 
-      const result = await response.json();
+        const result = await response.json();
 
-      if (!response.ok) {
-        throw new Error(result.error || "Erro ao salvar o grupo.");
-      }
-      await Swal.fire({
-        icon: "success",
-        title: "Sucesso!",
-        text: result.message || "Grupo cadastrado com sucesso!",
-        confirmButtonText: "OK",
-        customClass: {
-          confirmButton: "btn bg-prim",
-        },
-        buttonsStyling: false,
-      });
-      window.location.href = "/"; // Redireciona após o cadastro
-    } catch (error) {
+        if (!response.ok) {
+          throw new Error(result.error || "Erro ao salvar o grupo.");
+        }
         await Swal.fire({
-        icon: "error",
-        title: "Erro!",
-        text: result.message || `Erro ao salvar o grupo: ${error.message}`,
-        confirmButtonText: "OK",
-        customClass: {
-          confirmButton: "btn bg-prim",
-        },
-        buttonsStyling: false,
-      });
+          icon: "success",
+          title: "Sucesso!",
+          text: result.message || "Grupo cadastrado com sucesso!",
+          confirmButtonText: "OK",
+          customClass: {
+            confirmButton: "btn bg-prim",
+          },
+          buttonsStyling: false,
+        });
+        window.location.href = "/"; // Redireciona após o cadastro
+      } catch (error) {
+        await Swal.fire({
+          icon: "error",
+          title: "Erro!",
+          text: result.message || `Erro ao salvar o grupo: ${error.message}`,
+          confirmButtonText: "OK",
+          customClass: {
+            confirmButton: "btn bg-prim",
+          },
+          buttonsStyling: false,
+        });
+      }
     }
   }
 
@@ -136,3 +142,55 @@ $(document).ready(async function () {
     }
   });
 });
+async function validarEEnviarArquivo() {
+  const input = document.getElementById("uploadArquivo");
+  const file = input.files[0];
+
+  if (!file) {
+    alert("Nenhum arquivo selecionado.");
+    return;
+  }
+
+  // Valida extensão
+  const extensaoValida = file.name.endsWith(".xlsx");
+  if (!extensaoValida) {
+    alert("Por favor, envie um arquivo .xlsx");
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = async function (e) {
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data, { type: "array" });
+
+    const primeiraAba = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[primeiraAba];
+    const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+    const cabecalho = json[0];
+
+    if (!cabecalho || cabecalho[0]?.toLowerCase() !== "fatura" || cabecalho[1]?.toLowerCase() !== "celular") {
+      alert("Arquivo inválido. A primeira coluna deve ser 'fatura' e a segunda 'celular'.");
+      return;
+    }
+    alert("Arquivo válido!");
+
+    // Se válido, envia para o backend via POST
+    // const formData = new FormData();
+    // formData.append("arquivo", file);
+
+    // const response = await fetch("/upload", {
+    //   method: "POST",
+    //   body: formData
+    // });
+
+    // if (response.ok) {
+    //   alert("Arquivo enviado com sucesso!");
+    // } else {
+    //   alert("Erro ao enviar o arquivo.");
+    // }
+  };
+
+  reader.readAsArrayBuffer(file);
+}

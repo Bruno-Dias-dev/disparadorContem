@@ -1,9 +1,11 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, UploadFile, File, status, Form
 from src.models.mensagem_model import MensagemModel
 from src.models.grupo_mensagens_model import GrupoMensagensModel
 from src.services.api_client import get_mensagens 
 from src.services.mensagens_service import *
 from src.api_module.mensagens import get_conexoes_ativas, get_departamentos
+import pandas as pd
+import io
 
 router = APIRouter()
 
@@ -97,6 +99,49 @@ def listar_status_contrato():
 @router.get("/alerta-contrato", tags=["Alerta do Contrato"])
 def listar_alerta_contrato():
     return list_alerta_contrato()
+
+# Rota para Uploads de Faturas
+@router.post("/upload_faturas_excel", tags=["Faturas"])
+async def upload_faturas_excel(
+    file: UploadFile = File(...),
+    grupo_id: int = Form(...),
+    nome_grupo: str = Form(...)
+    ):
+    if not file.filename.endswith(".xlsx"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Por favor, envie um arquivo .xlsx"
+        )
+
+    try:
+        contents = await file.read()
+        df = pd.read_excel(io.BytesIO(contents))
+
+        df.columns = [col.lower().strip() for col in df.columns]
+        
+        required_columns = ["fatura", "celular"]
+        if not all(col in df.columns for col in required_columns):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="O arquivo deve conter as colunas: 'fatura', 'celular'."
+            )
+
+        faturas_para_inserir = []
+        for index, row in df.iterrows():
+            faturas_para_inserir.append({
+                "codigo_da_fatura": str(row["fatura"]),
+                "celular": str(row["celular"]),
+                "nome": nome_grupo,
+                "grupo_id": grupo_id
+            })
+
+        return insert_faturas_batch(faturas_para_inserir)
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erro ao processar o arquivo Excel: {str(e)}"
+        )
 
 # Grupo de Mensagens
 @router.post("/grupos", tags=["Grupos de Mensagens"])

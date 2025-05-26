@@ -2,6 +2,10 @@ from config.conn import PostgresConnection
 import os
 import json
 from dotenv import load_dotenv
+from fastapi import HTTPException, status
+from typing import List, Dict, Any
+import pandas as pd
+import io
 
 load_dotenv()
 
@@ -107,6 +111,31 @@ def list_alerta_contrato():
         return {"error": str(e)}
     finally:
         db.close()
+        
+def insert_faturas_batch(faturas_data: List[Dict[str, Any]]):
+    db = get_db()
+    inserted_count = 0
+    try:
+        table = "upload_faturas"
+        columns = ["codigo_da_fatura", "celular", "nome", "grupo_id"]
+
+        for fatura in faturas_data:
+            values = [
+                fatura["codigo_da_fatura"],
+                fatura["celular"],
+                fatura["nome"],
+                fatura["grupo_id"]
+            ]
+            db.insert_table(table=table, columns=columns, values=values)
+            inserted_count += 1
+        return {"message": f"{inserted_count} faturas inseridas com sucesso!"}
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erro ao inserir faturas no banco de dados: {str(e)}"
+        )
+    finally:
+        db.close()
 
 def create_grupo_mensagens(nome, convenios, estipulantes, status_contratos, alertas_contratos, ativo, pdf, fase):
     """Cria um novo grupo de mensagens no banco de dados."""
@@ -127,10 +156,23 @@ def create_grupo_mensagens(nome, convenios, estipulantes, status_contratos, aler
         ]
 
         db.insert_table(table=table, columns=columns, values=values)
-        return {"message": "Grupo criado com sucesso!"}
+        raw_id_result = db.execute_query("SELECT id FROM grupo_mensagens WHERE nome = %s ORDER BY created DESC LIMIT 1;", (nome,))
+        
+        if raw_id_result and isinstance(raw_id_result, (list, tuple)) and len(raw_id_result) > 0:
+            if isinstance(raw_id_result[0], dict): 
+                grupo_id = raw_id_result[0].get("id")
+            elif isinstance(raw_id_result[0], (list, tuple)):
+                grupo_id = raw_id_result[0][0]
+            else: 
+                grupo_id = raw_id_result[0]
+        else:
+            raise ValueError("ID do grupo não foi retornado ou resultado inválido.")
+        
+        return {"message": "Grupo criado com sucesso!", "grupo_id": grupo_id}
 
     except Exception as e:
-        return {"error": str(e)}
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Erro ao criar grupo: {str(e)}")
+        # return {"error": str(e)}
 
     finally:
         db.close()
@@ -140,7 +182,7 @@ def get_grupos_mensagens():
     db = get_db()
 
     try:
-        query = "SELECT * FROM grupo_mensagens ORDER BY created DESC"
+        query = "SELECT * FROM grupo_mensagens WHERE ativo = 't' ORDER BY created DESC"
         return db.execute_query(query)
 
     except Exception as e:
@@ -210,66 +252,130 @@ def delete_grupo_mensagens(grupo_id):
         db.close()        
         
 def get_faturas_por_grupo(grupo_id: int):
-    """Seleciona todas as faturas associadas a um grupo_id, lidando com NULL em todas as colunas"""
+    """
+    Seleciona faturas associadas a um grupo_id.
+    Prioriza 'upload_faturas', se vazio, busca em 'relatorio_faturas' com filtros do grupo.
+    """
     db = get_db()
     
     try:
-        query = """
-    SELECT 
-        rf.codigo_da_fatura,
-        celular,
-        qtde_dias_atraso
-    FROM 
-        relatorio_faturas rf
-    JOIN grupo_mensagens gm 
-        ON (
-            gm.convenios IS NULL 
-            OR gm.convenios->'valores' @> '["Todos"]'::jsonb
-            OR rf.convenio_do_fatura = ANY (
-                SELECT jsonb_array_elements_text(gm.convenios->'valores')
-            )
-        )
-        AND (
-            gm.estipulantes IS NULL 
-            OR rf.estipulante = ANY (
-                SELECT jsonb_array_elements_text(gm.estipulantes->'valores')
-            )
-        )
-        AND (
-            gm.status_contratos IS NULL 
-            OR rf.status_do_contrato = ANY (
-                SELECT jsonb_array_elements_text(gm.status_contratos->'valores')
-            )
-        )
-        AND (
-            gm.alertas_contratos IS NULL 
-            OR jsonb_array_length(gm.alertas_contratos->'valores') = 0 
-            OR rf.alerta = ANY (
-                SELECT jsonb_array_elements_text(gm.alertas_contratos->'valores')
-            )
-        )
-        AND (
-            gm.fase IS NULL
-            OR gm.fase = '0'
-            OR (
-                qtde_dias_atraso::INTEGER BETWEEN 
-                SPLIT_PART(gm.fase, '-', 1)::int AND 
-                SPLIT_PART(gm.fase, '-', 2)::int
-            )
-        )
-    WHERE 
-        gm.id = %s
-        AND
-        DATE(rf.updated_at) = CURRENT_DATE;
-    """
-        result = db.execute_query(query, (grupo_id,))    
+        # --- 1. Tentar buscar em upload_faturas ---
+        upload_faturas_query = """
+        SELECT
+            uf.codigo_da_fatura,
+            uf.celular,
+            NULL AS qtde_dias_atraso -- Adicionado para consistência de colunas com relatorio_faturas
+        FROM
+            upload_faturas uf
+        WHERE
+            uf.grupo_id = %s
+            AND uf.enviado = FALSE; -- Supondo que você só quer faturas não enviadas/processadas
+        """
+        
+        faturas_encontradas = db.execute_query(upload_faturas_query, (grupo_id,))
+        
+        if faturas_encontradas:
+            return faturas_encontradas
+        
+        # --- 2. Se não houver faturas em upload_faturas, buscar em relatorio_faturas ---
+        # Primeiro, obtenha os detalhes do grupo para aplicar os filtros.
+        grupo_detalhes_query = """
+        SELECT
+            nome, convenios, estipulantes, status_contratos, alertas_contratos, fase
+        FROM
+            grupo_mensagens
+        WHERE
+            id = %s;
+        """
+        grupo_detalhes_raw = db.execute_query(grupo_detalhes_query, (grupo_id,))
+        
+        if not grupo_detalhes_raw:
+            # Se o grupo não for encontrado, retorna uma lista vazia
+            return [] 
+        
+        # Assume que db.execute_query para SELECT retorna uma lista de dicionários
+        grupo = grupo_detalhes_raw[0] 
+        
+        # --- CORREÇÃO AQUI: NÃO USAR json.loads() ---
+        # Se 'db.execute_query' já retorna 'jsonb' como dicionários Python,
+        # basta usá-los diretamente. Adicionei um fallback robusto.
+        
+        convenios = grupo.get('convenios')
+        if not isinstance(convenios, dict) or convenios is None:
+            convenios = {"valores": []} # Fallback se não for um dicionário válido ou for None
+
+        estipulantes = grupo.get('estipulantes')
+        if not isinstance(estipulantes, dict) or estipulantes is None:
+            estipulantes = {"valores": []}
+
+        status_contratos = grupo.get('status_contratos')
+        if not isinstance(status_contratos, dict) or status_contratos is None:
+            status_contratos = {"valores": []}
+
+        alertas_contratos = grupo.get('alertas_contratos')
+        if not isinstance(alertas_contratos, dict) or alertas_contratos is None:
+            alertas_contratos = {"valores": []}
+            
+        # A fase já é string ou None, não precisa de tratamento especial
+        fase = grupo.get('fase') 
+
+        # Constrói a query dinâmica para relatorio_faturas
+        relatorio_faturas_select = """
+        SELECT
+            rf.codigo_da_fatura,
+            rf.celular,
+            rf.qtde_dias_atraso
+        FROM
+            relatorio_faturas rf
+        """
+        
+        conditions = []
+        query_params = []
+        
+        # Adiciona condições baseadas nos filtros do grupo
+        if convenios and convenios.get('valores') and "Todos" not in convenios['valores']:
+            conditions.append("rf.convenio_do_fatura = ANY (%s::text[])")
+            query_params.append(convenios['valores'])
+        
+        if estipulantes and estipulantes.get('valores'):
+            conditions.append("rf.estipulante = ANY (%s::text[])")
+            query_params.append(estipulantes['valores'])
+
+        if status_contratos and status_contratos.get('valores'):
+            conditions.append("rf.status_do_contrato = ANY (%s::text[])")
+            query_params.append(status_contratos['valores'])
+            
+        if alertas_contratos and alertas_contratos.get('valores'):
+            conditions.append("rf.alerta = ANY (%s::text[])")
+            query_params.append(alertas_contratos['valores'])
+        
+        # Lógica para Fase (qtde_dias_atraso)
+        if fase and fase != '0': 
+            try:
+                min_dias, max_dias = map(int, fase.split('-'))
+                conditions.append("rf.qtde_dias_atraso::INTEGER BETWEEN %s AND %s")
+                query_params.extend([min_dias, max_dias])
+            except ValueError:
+                print(f"Aviso: Fase '{fase}' não está no formato esperado (min-max). Ignorando filtro de fase.")
+                pass
+            
+        conditions.append("DATE(rf.updated_at) = CURRENT_DATE") 
+
+        # Constrói a query final
+        final_query = f"{relatorio_faturas_select}"
+        if conditions:
+            final_query += " WHERE " + " AND ".join(conditions)
+        
+        result = db.execute_query(final_query, tuple(query_params))
+        
         return result
 
     except Exception as e:
-        return {"error": str(e)}
+        print(f"Erro em get_faturas_por_grupo: {e}")
+        # Lança HTTPException para que o FastAPI capture e retorne um erro 500
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Erro ao buscar faturas: {str(e)}")
     finally:
         db.close()
-
 def list_mensagens():
     """Lista todas as mensagens."""
     db = get_db()

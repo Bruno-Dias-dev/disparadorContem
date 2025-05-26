@@ -37,15 +37,70 @@
   </div>
   <body class="container mt-5">
     <h2 class="mb-4" style="color: #ed1c24">Cadastrar Grupo de Mensagens</h2>
+    <div class="alert alert-primary alert-dismissible fade show" role="alert">
+      <b>Importação de Excel: Siga estas instruções para evitar erros!</b>
+      <ul>
+        <li><b>Formato:</b> Apenas arquivos <b>.xlsx</b> são aceitos.</li>
+        <li>
+          <b>Colunas Obrigatórias:</b>
+          <ul>
+            <li>
+              <b>1ª Coluna:</b> Chame de <b>fatura</b> (contém o código de
+              fatura).
+            </li>
+            <li>
+              <b>2ª Coluna:</b> Chame de <b>celular</b> (no formato
+              <b>(DD)999999999</b>, ex: <b>(21)987654321</b>).
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="alert"
+        aria-label="Fechar"
+      ></button>
+    </div>
+    <hr />
     <div class="card" style="border-color: #ed1c24; box-shadow: inset">
       <div class="card-body">
         <div class="card-header">
           <h5>Escolha o grupo de Mensagens</h5>
         </div>
+
         <form id="grupoForm">
           <div class="mb-3">
             <label for="nome" class="form-label">Nome do Grupo:</label>
             <input type="text" id="nome" class="form-control" required />
+          </div>
+          <div class="mb-3">
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="ativo"
+                checked
+              />
+              <label class="form-check-label" for="ativo" class="form-label"
+                >Grupo Ativo?</label
+              >
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="pdf"
+              />
+              <label class="form-check-label" for="pdf" class="form-label"
+                >Envio de PDF?</label
+              >
+            </div>
           </div>
           <div class="mb-3">
             <label for="nome" class="form-label">Tipo de Grupo:</label>
@@ -63,8 +118,13 @@
           </div>
           <div id="uploadArquivo" class="d-none">
             <div class="mb-3">
-              <label for="arquivo" class="form-label">Arquivo:</label>
-              <input type="file" id="arquivo" class="form-control" accept=".xlsx" />
+              <label for="arquivoExcel" class="form-label">Arquivo:</label>
+              <input
+                type="file"
+                id="arquivoExcel"
+                class="form-control"
+                accept=".xlsx"
+              />
             </div>
           </div>
           <div id="relatorioAutomacao" class="d-none">
@@ -122,35 +182,6 @@
                 class="form-select select2"
                 multiple
               ></select>
-            </div>
-
-            <div class="mb-3">
-              <div class="form-check form-switch">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  role="switch"
-                  id="ativo"
-                  checked
-                />
-                <label class="form-check-label" for="ativo" class="form-label"
-                  >Grupo Ativo?</label
-                >
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <div class="form-check form-switch">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  role="switch"
-                  id="pdf"
-                />
-                <label class="form-check-label" for="pdf" class="form-label"
-                  >Envio de PDF?</label
-                >
-              </div>
             </div>
           </div>
           <button type="button" class="btn btn-secondary" id="limparCamposBtn">

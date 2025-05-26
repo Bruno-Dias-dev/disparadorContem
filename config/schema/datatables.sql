@@ -75,4 +75,34 @@ CREATE TABLE logs_envio (
     qtd_falha INTEGER DEFAULT 0
 );
 
+CREATE TABLE upload_faturas (
+    id SERIAL PRIMARY KEY NOT NULL,
+    nome VARCHAR(250),
+    codigo_da_fatura VARCHAR(250),
+    celular VARCHAR(20),
+    enviado BOOLEAN DEFAULT FALSE,
+    created TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    modified TIMESTAMP WITH TIME ZONE
+);
 
+CREATE OR REPLACE FUNCTION update_modified_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.modified = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER upload_faturas_modified_at
+BEFORE UPDATE ON upload_faturas
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_column();
+
+ALTER TABLE upload_faturas
+ADD COLUMN grupo_id INTEGER;
+
+-- Adicionar a chave estrangeira (FK)
+-- Isso garante que cada grupo_id em upload_faturas realmente exista em grupo_mensagens
+ALTER TABLE upload_faturas
+ADD CONSTRAINT fk_grupo_mensagens
+FOREIGN KEY (grupo_id) REFERENCES grupo_mensagens (id) ON DELETE CASCADE;

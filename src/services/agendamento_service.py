@@ -61,7 +61,11 @@ def listar_agendamentos():
     db = get_db()    
 
     try:
-        query = "SELECT A.*, GP.nome FROM agendamentos A INNER JOIN grupo_mensagens GP on A.grupo_id = GP.id"
+        query = """SELECT A.*, GP.nome 
+            FROM agendamentos A 
+            INNER JOIN grupo_mensagens GP on A.grupo_id = GP.id
+            WHERE A.ativo = 't'
+            ORDER BY id desc LIMIT 10"""            
         result = db.execute_query(query)
         return result
     except Exception as e:
@@ -74,6 +78,8 @@ def excluir_agendamento(agendamento_id):
     db = get_db()
 
     try:
+        db.execute_query("DELETE FROM logs_envio WHERE agendamento_id = %s;", (agendamento_id,))
+
         query = "DELETE FROM agendamentos WHERE id = %s"
         db.execute_query(query, (agendamento_id,))
         return {"message": "Agendamento removido com sucesso"}

@@ -3,6 +3,7 @@ import csv
 import time
 from src.api_module.mensagens import *
 from datetime import datetime
+import os
 
 def processar_xlsx(arquivo_xlsx):
     df = pd.read_excel(arquivo_xlsx)
@@ -47,23 +48,23 @@ def envio_via_banco(data_msg, fatura, pdf):
     try:
         if pdf: 
             enviar_mensagem_com_pdf(data_msg)
-            resultado = f"Mensagem enviada, com PDF, para {numero} com código da fatura {str(fatura['codigo_da_fatura'])}"
             resultados.append([fatura['codigo_da_fatura'], numero, 'Sucesso', ''])
         else:    
             post_mensagem_sem_cadastro(data_msg)
-            resultado = f"Mensagem enviada para {numero} com código da fatura {str(fatura['codigo_da_fatura'])}"
             resultados.append([fatura['codigo_da_fatura'], numero, 'Sucesso', ''])
     except Exception as e:
-        resultado = f"Falha ao enviar mensagem para {numero} com código da fatura {str(fatura['codigo_da_fatura'])}: {e}"
         resultados.append([fatura['codigo_da_fatura'], numero, 'Falha', str(e)])
     
-    # Escrever os resultados no arquivo CSV
     data_hoje = datetime.now().strftime('%Y-%m-%d')  
     nome_arquivo = f'{data_hoje}_resultados_envio_automacao.csv'
-    
-    with open(nome_arquivo, mode='w', newline='') as file:
+
+    # Só escreve o cabeçalho se o arquivo ainda não existe
+    escrever_cabecalho = not os.path.isfile(nome_arquivo)
+
+    with open(nome_arquivo, mode='a', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(['Código da Fatura', 'Número', 'Status', 'Erro'])
+        if escrever_cabecalho:
+            writer.writerow(['Código da Fatura', 'Número', 'Status', 'Erro'])
         writer.writerows(resultados)
         
 def formtatar_numero(numero):

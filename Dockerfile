@@ -22,7 +22,7 @@ COPY . .
 EXPOSE 8000
 
 # Comando para rodar em produção (mais robusto que uvicorn puro)
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "app:app", "--bind", "0.0.0.0:8000", "--workers", "4"]
+CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "src.api:app", "--bind", "0.0.0.0:8000", "--workers", "4"]
 
 # Alternativamente, se preferir usar uvicorn diretamente, descomente a linha abaixo e comente a linha acima
 # CMD ["uvicorn", "main:app", "--host"#, "0.0.0.0", "--port", "8000"]

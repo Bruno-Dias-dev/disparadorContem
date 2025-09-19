@@ -26,7 +26,7 @@ def processar_xlsx(arquivo_xlsx):
         time.sleep(1)
 
     # Escrever os resultados no arquivo CSV
-    with open('resultados_envio.csv', mode='w', newline='') as file:
+    with open('envios/resultados_envio.csv', mode='w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(['Código da Fatura', 'Número', 'Status', 'Erro'])
         writer.writerows(resultados)

@@ -1,10 +1,12 @@
 document.addEventListener("DOMContentLoaded", async function () {
-  const API_URL = "http://127.0.0.1:8000";
+  const API_URL = "http://212.85.21.32:8000";
+  const apiUrl = API_URL;
   const listaAgendamentos = document.getElementById("listaAgendamentos");
 
   async function carregarAgendamentos() {
+    alert(apiUrl);
     try {
-      const response = await fetch(`${API_URL}/api/agendamentos/`);
+      const response = await fetch(`${apiUrl}/api/agendamentos/`);
       const agendamentos = await response.json();
 
       if (agendamentos.length === 0) {
@@ -75,7 +77,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   async function excluirAgendamento(id) {
     try {
-      const response = await fetch(`${API_URL}/api/agendamento/${id}`, {
+      const response = await fetch(`${apiUrl}/api/agendamento/${id}`, {
         method: "DELETE",
         credentials: "include",
       });

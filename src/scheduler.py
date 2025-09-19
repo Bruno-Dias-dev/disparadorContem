@@ -3,6 +3,7 @@ from datetime import datetime
 import pytz
 import time
 import random
+import json
 import concurrent.futures # Importar para usar ThreadPoolExecutor
 from apscheduler.executors.pool import ThreadPoolExecutor
 from src.services.agendamento_service import listar_agendamentos, registrar_log_envio
@@ -36,7 +37,7 @@ def enviar_mensagens_para_grupo(agendamento_data):
         "text": f"Iniciando envio de mensagens para Agendamento {agendamento_id}",
         "serviceId": conexao_id,
         "departmentId": departamento_id,
-        "celular": str("(85)989400378") # Celular fixo para log, ajuste se necessário
+        "celular": str("(85)997048236") # Celular fixo para log, ajuste se necessário
     })
     
     inicio_envio = datetime.now()
@@ -60,6 +61,7 @@ def enviar_mensagens_para_grupo(agendamento_data):
         for i, fatura in enumerate(faturas):
             try:
                 mensagem_gerada = reescrever_mensagem(mensagem_cadastrada)
+                # mensagem_gerada = str(mensagem_cadastrada['mensagem']) # Use o texto da mensagem cadastrada
                 data_msg = {
                     "text": mensagem_gerada,
                     "serviceId": conexao_id,
@@ -90,7 +92,7 @@ def enviar_mensagens_para_grupo(agendamento_data):
             "text": f"Finalização envio Agendamento {agendamento_id}: {qtd_enviados} enviados, {qtd_falha} falhas",
             "serviceId": conexao_id,
             "departmentId": departamento_id,
-            "celular": str("(85)989400378") # Celular fixo para log, ajuste se necessário
+            "celular": str("(85)997048236") # Celular fixo para log, ajuste se necessário
         })
         
         registrar_log_envio(

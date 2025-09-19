@@ -1,7 +1,7 @@
 $(document).ready(async function () {
     
     
-  const API_URL = "http://127.0.0.1:8000";
+  const API_URL = "http://212.85.21.32:8000";
 
   const pathSegments = window.location.pathname.split("/");
   const msg_id = pathSegments[pathSegments.length - 1];
@@ -13,7 +13,7 @@ $(document).ready(async function () {
 
   async function carregarMensagens() {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/mensagens/view/${msg_id}`); 
+      const response = await fetch(`${API_URL}/mensagens/view/${msg_id}`);
       if (!response.ok) throw new Error("Mensagem não encontrada");
       const mensagem = await response.json();
 

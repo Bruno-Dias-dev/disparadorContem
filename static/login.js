@@ -2,7 +2,9 @@ async function login() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
-  const response = await fetch("http://127.0.0.1:8000/login", {
+  const API_URL = "http://212.85.21.32:8000";
+
+  const response = await fetch(`${API_URL}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password })
@@ -19,7 +21,7 @@ async function login() {
 
 async function acessarProtegido() {
   const token = localStorage.getItem("token");
-  const response = await fetch("http://127.0.0.1:8000/protected", {
+  const response = await fetch(`${API_URL}/protected`, {
       headers: { "Authorization": `Bearer ${token}` }
   });
 

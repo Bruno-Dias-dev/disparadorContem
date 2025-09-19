@@ -48,6 +48,9 @@ def post_mensagem(data: Dict[str, str]) -> Dict[str, Any]:
 
     try:
         response = requests.post(get_url(URI_MESSAGES), headers=get_headers(), json=payload)
+        # print(f"Response: {response.status_code} - {response.text}")
+        if response.status_code != 200:
+            raise Exception(f"Erro ao enviar mensagem: {response.status_code} - {response.text}")
         return response.json()
     except Exception as e:
         return tratar_erro(e)
@@ -56,6 +59,7 @@ def post_mensagem_sem_cadastro(data: Dict[str, str]) -> Dict[str, Any]:
     """
     Envia mensagem para número ainda não cadastrado como contato.
     """
+    # print(f"Tipo do texto: {type(data['text'])}")
     payload = {
         "text": data['text'],
         "type": "chat",
@@ -68,6 +72,9 @@ def post_mensagem_sem_cadastro(data: Dict[str, str]) -> Dict[str, Any]:
 
     try:
         response = requests.post(get_url(URI_MESSAGES), headers=get_headers(), json=payload)
+        # print(f"Response: {response.status_code} - {response.text}")
+        # if response.status_code != 200:
+        #     raise Exception(f"Erro ao enviar mensagem: {response.status_code} - {response.text}")
         return response.json()
     except Exception as e:
         return tratar_erro(e)

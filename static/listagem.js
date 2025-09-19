@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async function () {
-  const API_URL = "http://127.0.0.1:8000";
+  const API_URL = "http://212.85.21.32:8000";
   const listaGrupos = document.getElementById("listaGrupos");
 
   async function carregarGrupos() {

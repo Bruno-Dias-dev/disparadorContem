@@ -5,10 +5,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     width: "100%",
   });
 
-  const API_URL = window.api_url;
-  console.log("URL da API:", API_URL);
-
-  // const API_URL = "http://127.0.0.1:8000";
+  const API_URL = "http://212.85.21.32:8000";
   const pathSegments = window.location.pathname.split("/");
   const grupoId = pathSegments[pathSegments.length - 1];
 
@@ -20,7 +17,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   async function carregarGrupo() {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/grupos/${grupoId}`);
+      const response = await fetch(`${API_URL}/grupos/${grupoId}`);
       if (!response.ok) throw new Error("Grupo não encontrado");
 
       const grupo = await response.json();
@@ -73,7 +70,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     try {
       // Buscar todas as opções da API
-      const response = await fetch(`http://127.0.0.1:8000${endpoint}`);
+      const response = await fetch(`http://212.85.21.32:8000${endpoint}`);
       const allOptions = await response.json();
 
       if (endpoint === "/convenios") {
@@ -148,7 +145,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         pdf: pdf,
       };
 
-      const url = `http://127.0.0.1:8000/grupos/${grupoId}`;
+      const url = `http://212.85.21.32:8000/grupos/${grupoId}`;
       const method = "PUT";
 
       try {

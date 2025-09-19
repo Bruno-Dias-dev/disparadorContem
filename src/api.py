@@ -12,6 +12,7 @@ from src.routers.agendamento_router import router as agendamento_router
 from src.api_module import auth
 from src.middlewares.redirect_unauthorized import RedirectUnauthorizedMiddleware
 from src.routers.usuario_route import router as usuario_route
+from src.routers.config_route import router as config_route
 
 import os
 from dotenv import load_dotenv
@@ -51,13 +52,7 @@ app.include_router(auth.router)
 app.include_router(mensagens_router)
 app.include_router(agendamento_router)
 app.include_router(usuario_route)
-
-@app.get("/config.js")
-def get_config_js():
-    return {"api_url": settings.api_url}
-    # js = f'window.API_URL = "{settings.API_URL}";'
-    # print(js)
-    # return Response(content=js, media_type="application/javascript")
+app.include_router(config_route)
 
 @app.get("/login")
 async def serve_login():

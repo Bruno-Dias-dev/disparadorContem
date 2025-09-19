@@ -5,7 +5,7 @@ $(document).ready(async function () {
     width: "100%",
   });
 
-  const API_URL = "http://127.0.0.1:8000";
+  const API_URL = "http://212.85.21.32:8000";
   const endpoints = {
     grupos: "/grupos",
     mensagens: "/mensagens",

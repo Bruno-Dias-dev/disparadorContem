@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", async function () {
   const listaAgendamentos = document.getElementById("listaAgendamentos");
 
   async function carregarAgendamentos() {
-    alert(apiUrl);
     try {
       const response = await fetch(`${apiUrl}/api/agendamentos/`);
       const agendamentos = await response.json();

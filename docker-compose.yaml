@@ -16,7 +16,7 @@ services:
       - postgres
     restart: always
     networks:
-      - my_network  # <- mesma rede do outro stack
+      - etl_contem_my_network  
 networks:
-  my_network:
-    external: true  # <- usa rede já criada no outro docker-compose
+  etl_contem_my_network:
+    external: true 
